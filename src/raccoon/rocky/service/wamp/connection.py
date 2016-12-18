@@ -25,6 +25,51 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
     joined the realm.
     """
 
+    def __init__(self, url, realm, loop=None, **kwargs):
+        """:param str url: a :term:`WAMP` connection url
+        :param str realm: a :term:`WAMP` realm to enter
+        :param loop: an optional asyncio loop
+
+        Every other keyword argument will be passed to the underlying
+        autobahn client.
+        """
+        super().__init__(url, realm, loop=None, **kwargs)
+        self.session = None
+        self.session_details = None
+
+    def _notify_disconnect(self):
+        """NOTE: This is not a coroutine but returns one."""
+        try:
+            return self.on_disconnect.notify(loop=self.loop)
+        finally:
+            self.session = None
+            self.session_details = None
+
+    async def _on_session_leave(self, details):
+        return self._notify_disconnect()
+
+    async def connect(self, username=None, password=None):
+        "Emits the ``on_connect`` signal."
+        session, sess_details = await super().connect(username, password,
+                                                      session_class=Session)
+        self.session = session
+        self.session_details = sess_details
+        await self.on_connect.notify(session=session,
+                                     session_details=sess_details,
+                                     loop=self.loop)
+        session.on_leave.connect(self._on_session_leave)
+        return session, sess_details
+
+    @property
+    def connected(self):
+        """Returns ``True`` if if this connection is attached to a session."""
+        return self.session is not None and self.session.is_attached()
+
+    async def disconnect(self):
+        "Emits the ``on_disconnect`` signal."
+        await self._notify_disconnect()
+        await super().disconnect()
+
     @on_connect.on_connect
     async def on_connect(self, handler, subscribers, connect):
         """Call handler immediately if the session is attached already"""
@@ -42,40 +87,6 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
         if not self.connected:
             await disconnect.notify(handler, loop=self.loop)
         disconnect(handler)
-
-    def __init__(self, url, realm, loop=None, **kwargs):
-        """:param str url: a :term:`WAMP` connection url
-        :param str realm: a :term:`WAMP` realm to enter
-        :param loop: an optional asyncio loop
-
-        Every other keyword argument will be passed to the underlying
-        autobahn client.
-        """
-        super().__init__(url, realm, loop=None, **kwargs)
-        self.session = None
-        self.session_details = None
-
-    async def connect(self, username=None, password=None):
-        "Emits the ``on_connect`` signal."
-        session, sess_details = await super().connect(username, password,
-                                                      session_class=Session)
-        self.session = session
-        self.session_details = sess_details
-        await self.on_connect.notify(session=session,
-                                     session_details=sess_details,
-                                     loop=self.loop)
-        session.on_leave.connect(self._on_session_leave)
-        return session, sess_details
-
-    async def disconnect(self):
-        "Emits the ``on_disconnect`` signal."
-        await self._notify_disconnect()
-        await super().disconnect()
-
-    @property
-    def connected(self):
-        """Returns ``True`` if if this connection is attached to a session."""
-        return self.session is not None and self.session.is_attached()
 
     def run(self):
         """Adds a ``SIGTERM`` handler and runs the loop until the connection
@@ -100,14 +111,3 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
             self.loop.run_until_complete(self.protocol._session.leave())
 
         self.loop.close()
-
-    def _notify_disconnect(self):
-        """NOTE: This is not a coroutine but returns one."""
-        try:
-            return self.on_disconnect.notify(loop=self.loop)
-        finally:
-            self.session = None
-            self.session_details = None
-
-    async def _on_session_leave(self, details):
-        return self._notify_disconnect()
