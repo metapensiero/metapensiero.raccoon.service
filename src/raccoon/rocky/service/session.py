@@ -141,6 +141,17 @@ class SessionMember(PairableNode):
         context.path_resolvers.append(RolePathResolver())
         super().__init__(context)
 
+    @handler('on_info')
+    async def handle_pairing_message(self, *args, **kwargs):
+        """Listens for messages of type 'peer_ready'"""
+        msg_type = kwargs.get('msg_type', None)
+        if msg_type == 'pairing_request':
+            details = kwargs['msg_details']
+            await self.create_new_peer(details)
+
+    async def create_new_peer(self, details):
+        raise NotImplementedError("An incoming pairing request must be handled")
+
 
 async def bootstrap_session(wamp_context, service_uri, factory,
                             location_name=None, session_id=None):
