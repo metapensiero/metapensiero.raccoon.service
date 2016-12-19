@@ -29,9 +29,9 @@ class PairingRequest:
     def __init__(self, locations, details=None):
         self.details = details or {}
         self.locations = locations
-        self.location_ready = {r: reactive.Value(initial_value=False) for
-                               r in locations}
-        self.location_info = {r: None for r in locations}
+        self.location_ready = {l: reactive.Value(initial_value=False) for
+                               l in locations}
+        self.location_info = {l: None for l in locations}
 
     def set_location_ready(self, location, uri, role=None, **kwargs):
         self.location_ready[location].value = True
@@ -56,7 +56,7 @@ class SessionRoot(WAMPNode):
     status = None
 
     def __init__(self, session_base_path, session_context, locations,
-                 local_location, local_member_factory):
+                 local_location_name, local_member_factory):
         """
         :param `Service` service: the service running this session
         :param str session_base_path: a string with the uri of this session or a
@@ -64,30 +64,32 @@ class SessionRoot(WAMPNode):
         :param `WAMPNodeContext` session_context: a context object with connection
           infos
         :param tuple locations: a tuple containing all the location names involved
-        :param str local_location: the location assumed by the *local* member
+        :param str local_location_name: the location assumed by the *local* member
         :param SessionMember local_member_factory: the node object class that
           will fullfill the *local* location.
         """
-        self.locations = locations,
-        self.local_location = local_location
+        self.locations = locations
+        self.local_location_name = local_location_name
         self._pairing_requests = {}
         self._pairing_counter = 0
         self.node_bind(session_base_path, session_context,
                        session_context.service)
         self._pairing_requests[0] = PairingRequest(locations)
-        member_context = session_context.new(location=local_location,
+        member_context = session_context.new(location=local_location_name,
                                              pairing_request={'id': 0})
         local_member = local_member_factory(member_context)
-        setattr(self, local_location, local_member)
+        setattr(self, local_location_name, local_member)
         self.manage_pairings()
 
     def _new_pairing_id(self):
+        """Generate a new pairing id"""
         self._pairing_counter += 1
         res = self._pairing_counter
         return res
 
     @handler('on_info')
     def handle_pairing_message(self, *args, **kwargs):
+        """Listens for messages of type 'peer_ready'"""
         msg_type = kwargs.get('msg_type', None)
         if msg_type == 'peer_ready':
             details = kwargs['msg_details']
