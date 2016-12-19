@@ -18,6 +18,7 @@ import sys
 from tempfile import mkdtemp
 import time
 
+from metapensiero import reactive
 import pytest
 import txaio
 
@@ -51,14 +52,14 @@ def launch_crossbar(directory):
 
     out = bytearray()
 
-    max_start_time = 5
-    for count in range(10):
-        time.sleep(max_start_time/10)
+    max_start_time = 10
+    for count in range(20):
+        time.sleep(max_start_time/20)
         try:
             o = os.read(process.stdout.fileno(), 256)
             if o:
                 out += o
-        except BlockingIOError: # emacs may flag an error here, ignore it
+        except BlockingIOError:  # emacs may flag an error here, ignore it
             pass
 
         if b"transport 'transport-001' started" in out:
@@ -171,8 +172,12 @@ def setup_txaio(event_loop):
     txaio.config.loop = event_loop
 
 
+@pytest.fixture
+def setup_reactive(event_loop):
+    reactive.get_tracker().flusher.loop = event_loop
+
 @pytest.yield_fixture
-def connection1(request, event_loop, ws_url, setup_txaio):
+def connection1(request, event_loop, ws_url, setup_txaio, setup_reactive):
     kwargs = getattr(request, 'param', {'username': 'user1',
                                         'password': 'abc123'})
     conn = Connection(ws_url, 'default', loop=event_loop)
@@ -183,7 +188,7 @@ def connection1(request, event_loop, ws_url, setup_txaio):
 
 
 @pytest.yield_fixture
-def connection2(request, event_loop, ws_url, setup_txaio):
+def connection2(request, event_loop, ws_url, setup_txaio, setup_reactive):
     kwargs = getattr(request, 'param', {'username': 'user2',
                                         'password': 'abc123'})
     conn = Connection(ws_url, 'default', loop=event_loop)
