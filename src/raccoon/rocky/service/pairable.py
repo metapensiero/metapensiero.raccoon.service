@@ -51,7 +51,7 @@ class PairableNode(WAMPNode):
             if peers:
                 self.node_context.peers = peers
             logger.debug("Pairing phase completed with peers: '%s'", peers)
-            await self.start(start_info=details)
+            await self.start(details)
 
     @handler('on_node_registration_success')
     async def handle_registration_success(self, **_):
