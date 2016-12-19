@@ -9,6 +9,7 @@
 import logging
 
 from metapensiero import reactive
+from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal, handler
 from raccoon.rocky.node import call, WAMPNode
 from raccoon.rocky.node.path import Path
@@ -137,3 +138,35 @@ class SessionMember(PairableNode):
     def __init__(self, context):
         assert context
         super().__init__(context)
+
+
+async def bootstrap_session(wamp_context, service_uri, factory,
+                            location_name=None, session_id=None):
+    """Helper method to start a session in the right way. The factory passed in
+    should create an instance which whose class is derived from
+    `SessionMember`.
+
+    :param `WAMPNodeContext` wamp_context: a node context already connected
+    :param str service_uri: the path of the `ApplicationService` to call
+    :param callable factory: a factory that will be called to produce the
+      local member of the session
+    :param str location_name: optional wanted location name for the session
+      member. It is ``client`` by default. It can be changed by the service.
+    :param int session_id: not used right now. It's possible use will be to
+      specify a session_id to join rather than start a new one.
+    :returns: an instance of `SessionMember` that is part of the session
+    """
+    location_name = location_name or 'client'
+    session_starter = str(Path(service_uri) + 'start_session')
+    wsession = wamp_context.wamp_session
+    session_info = await wsession.call(session_starter, location_name,
+                                       session_id)
+    session_ctx = wamp_context.new(location=session_info['location'],
+                                   pairing_request={'id': 0},
+                                   session_id=session_info['id'])
+    local_path = Path(session_info['location'], session_info['base'])
+    async with transaction.begin():
+        local_session_member = factory(session_ctx)
+        assert isinstance(local_session_member, SessionMember)
+        local_session_member.node_bind(local_path, session_ctx)
+    return local_session_member
