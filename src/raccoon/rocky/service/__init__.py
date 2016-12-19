@@ -10,4 +10,6 @@ from metapensiero.reactive.flush.asyncio import AsyncioFlushManager
 
 reactive.set_flusher_factory(AsyncioFlushManager)
 
+from .pairable import PairableNode
 from .service import BaseService, ApplicationService
+from .session import SessionRoot, SessionMember, bootstrap_session
