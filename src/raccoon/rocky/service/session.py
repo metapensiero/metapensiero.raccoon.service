@@ -136,8 +136,6 @@ class SessionRoot(WAMPNode):
 
 class SessionMember(PairableNode):
 
-    on_info = Signal()
-
     def __init__(self, context):
         assert context
         context.path_resolvers.append(RolePathResolver())
