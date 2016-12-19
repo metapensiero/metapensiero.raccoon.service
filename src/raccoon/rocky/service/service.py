@@ -111,6 +111,8 @@ class ApplicationService(BaseService):
     factory with a tailored context.
     """
 
+    location_name = 'server'
+
     def __init__(self, factory, node_path, node_context=None):
         """
         :param path: Path of the service :term:`WAMP` path
@@ -130,7 +132,7 @@ class ApplicationService(BaseService):
         self._next_session_num += 1
         return str(res)
 
-    async def _create_session(self, session_id):
+    async def _create_session(self, session_id, from_location):
         session_ctx = self.node_context.new()
         session_ctx.service = self
         session_ctx.session_id = session_id
@@ -138,20 +140,24 @@ class ApplicationService(BaseService):
         session_path.base = session_path
         async with transaction.begin():
             sess = SessionRoot(session_path, session_ctx,
-                               ['client', 'server'], 'server', self._factory)
+                               locations=[from_location, self.location_name],
+                               local_location_name=self.location_name,
+                               local_member_factory=self._factory)
         return sess
 
     @call
-    async def start_session(self, session_id=None, details=None):
+    async def start_session(self, from_location, session_id=None,
+                            details=None):
         if (session_id and session_id not in self._sessions) or \
            not session_id:
             session_id = self._next_session_id()
-            session_root = sr = await self._create_session(session_id)
+            session_root = sr = await self._create_session(session_id,
+                                                           from_location)
             self._sessions[session_id] = session_root
         else:
             session_root = sr = self._sessions[session_id]
         return {
-            'location': 'client',
+            'location': from_location,
             'base': str(sr.node_path),
             'id': sr.node_context.session_id
         }
