@@ -101,7 +101,7 @@ class BaseService(WAMPNode):
             self.node_register()
             # ensure that all the registrations have completed after this
             # point
-        logger.debug("Service at %r started" % self.node_path)
+        logger.debug("Service at %r started", self.node_path)
 
 
 class ApplicationService(BaseService):
