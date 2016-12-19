@@ -41,10 +41,10 @@ class BaseService(WAMPNode):
 
     def __init__(self, node_path, node_context=None):
         """
-        :param path: Path of the service :term:`WAMP` path
-        :type path: an instance of :class:`~raccoon.rocky.node.path.Path`
-        :param context: An optional parent context
-        :type context: An instance of
+        :param node_path: Path of the service :term:`WAMP` path
+        :type node_path: an instance of :class:`~raccoon.rocky.node.path.Path`
+        :param node_context: An optional parent context
+        :type node_context: An instance of
           :class:`~raccoon.rocky.node.context.WAMPContext`
         """
         self._connection = None
