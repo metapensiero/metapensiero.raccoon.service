@@ -5,5 +5,9 @@
 # :License:   GNU General Public License version 3 or later
 # :Copyright: Copyright (C) 2016 Arstecnica s.r.l.
 #
+from metapensiero import reactive
+from metapensiero.reactive.flush.asyncio import AsyncioFlushManager
+
+reactive.set_flusher_factory(AsyncioFlushManager)
 
 from .service import BaseService, ApplicationService
