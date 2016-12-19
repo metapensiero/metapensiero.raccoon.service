@@ -62,7 +62,7 @@ class PairableNode(WAMPNode):
         available only when acknowledging.
         """
         pr = getattr(self.node_context, 'pairing_request', None)
-        if pr and 'id' in pr:
+        if pr and isinstance(pr, dict) and 'id' in pr:
             pr_id = pr['id']
         else:
             pr_id = await self.remote('@pairing_request')(
