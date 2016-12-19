@@ -15,6 +15,7 @@ from raccoon.rocky.node import call, WAMPNode
 from raccoon.rocky.node.path import Path
 
 from .pairable import PairableNode
+from .resolver import RolePathResolver
 
 logger = logging.getLogger(__name__)
 
@@ -137,6 +138,7 @@ class SessionMember(PairableNode):
 
     def __init__(self, context):
         assert context
+        context.path_resolvers.append(RolePathResolver())
         super().__init__(context)
 
 
