@@ -12,6 +12,7 @@ from raccoon.rocky.node import Path
 from raccoon.rocky.node import WAMPNode
 from raccoon.rocky.node.wamp import call
 from raccoon.rocky.service.service import BaseService, ApplicationService
+from raccoon.rocky.service.session import SessionMember, bootstrap_session
 
 @pytest.mark.asyncio
 async def test_start_service(connection1, event_loop):
@@ -80,7 +81,11 @@ async def test_double_services(connection1, connection2, event_loop, events):
 async def test_application_service(connection1, connection2, event_loop,
                                    events):
 
-    events.define('app_started', 'start_session', 'start_session2', 'completed')
+    import asyncio
+    assert event_loop is asyncio.get_event_loop()
+    assert connection1.loop is event_loop
+    assert connection2.loop is event_loop
+    events.define('app_started', 'start_session', 'start_session2',)
 
     class MyAppService(ApplicationService):
 
@@ -88,9 +93,10 @@ async def test_application_service(connection1, connection2, event_loop,
         def _set_started_event(self, **_):
             events['app_started'].set()
 
-    class MyApplication(WAMPNode):
+    class MyApplication(SessionMember):
 
         def __init__(self, context):
+            super().__init__(context)
             self._counter = 0
 
         @call
@@ -98,35 +104,29 @@ async def test_application_service(connection1, connection2, event_loop,
             self._counter += 1
             return self._counter
 
+    class TestClient(SessionMember):
+        pass
+
     s1 = MyAppService(MyApplication, Path('raccoon.appservice'))
     await s1.set_connection(connection1)
-
-    async def do_inc_counter(session, **kwargs):
-        await events.wait_for(events.app_started, 5)
-        session_info = await session.call('raccoon.appservice.start_session')
-        events.start_session.set()
-        assert 'id' in session_info
-        assert 'path' in session_info
-        id1 = session_info['id']
-        path1 = session_info['path']
-        inc_counter = str(Path(path1) + 'inc_counter')
-        counter = await session.call(inc_counter)
-        assert counter == 1
-        counter = await session.call(inc_counter)
-        assert counter == 2
-        # now create a new session
-        session_info = await session.call('raccoon.appservice.start_session')
-        events.start_session2.set()
-        assert 'id' in session_info
-        assert 'path' in session_info
-        id2 = session_info['id']
-        path2 = session_info['path']
-        assert id2 != id1
-        assert path2 != path1
-        inc_counter = str(Path(path2) + 'inc_counter')
-        counter = await session.call(inc_counter)
-        assert counter == 1
-        events.completed.set()
-
-    await connection2.on_connect.connect(do_inc_counter)
+    await events.wait_for(events.app_started, 5)
+    tc = await bootstrap_session(connection2.new_context(),
+                                 'raccoon.appservice', TestClient,
+                                 'test')
+    events.start_session.set()
+    assert 'location' in tc.node_context and tc.node_context.location == 'test'
+    counter = await tc.remote('@server').inc_counter()
+    assert counter == 1
+    counter = await tc.remote('@server').inc_counter()
+    assert counter == 2
+    # now create a new session
+    tc2 = await bootstrap_session(connection2.new_context(),
+                                 'raccoon.appservice', TestClient,
+                                 'test')
+    events.start_session2.set()
+    assert 'location' in tc.node_context and tc.node_context.location == 'test'
+    assert tc.node_context.session_id != tc2.node_context.session_id
+    assert str(tc.node_path) != str(tc2.node_path)
+    counter = await tc2.remote('@server').inc_counter()
+    assert counter == 1
     await events.wait(timeout=5)
