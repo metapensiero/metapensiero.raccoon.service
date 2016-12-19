@@ -11,6 +11,7 @@ import signal
 
 from arstecnica.raccoon.autobahn.client import Client
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
+from raccoon.rocky.node import WAMPNodeContext
 
 from .session import Session
 
@@ -69,6 +70,10 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
         "Emits the ``on_disconnect`` signal."
         await self._notify_disconnect()
         await super().disconnect()
+
+    def new_context(self):
+        """Return a new `WAMPNodeContext` instance tied to this connection"""
+        return WAMPNodeContext(loop=self.loop, wamp_session=self.session)
 
     @on_connect.on_connect
     async def on_connect(self, handler, subscribers, connect):
