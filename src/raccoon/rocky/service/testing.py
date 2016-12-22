@@ -6,6 +6,7 @@
 # :Copyright: Copyright (C) 2016 Arstecnica s.r.l.
 #
 
+import asyncio
 import atexit
 from contextlib import closing
 from fcntl import fcntl, F_GETFL, F_SETFL
@@ -180,18 +181,24 @@ def setup_reactive(event_loop):
 def connection1(request, event_loop, ws_url, setup_txaio, setup_reactive):
     kwargs = getattr(request, 'param', {'username': 'user1',
                                         'password': 'abc123'})
-    conn = Connection(ws_url, 'default', loop=event_loop)
-
-    event_loop.run_until_complete(conn.connect(**kwargs))
+    conn = _create_connection(kwargs, event_loop, ws_url)
     yield conn
-    event_loop.run_until_complete(conn.disconnect())
+    _close_connection(conn)
 
 
 @pytest.yield_fixture
 def connection2(request, event_loop, ws_url, setup_txaio, setup_reactive):
     kwargs = getattr(request, 'param', {'username': 'user2',
                                         'password': 'abc123'})
-    conn = Connection(ws_url, 'default', loop=event_loop)
-    event_loop.run_until_complete(conn.connect(**kwargs))
+    conn = _create_connection(kwargs, event_loop, ws_url)
     yield conn
-    event_loop.run_until_complete(conn.disconnect())
+    _close_connection(conn)
+
+def _create_connection(login, event_loop, ws_url):
+    conn = Connection(ws_url, 'default', loop=event_loop)
+    connect_future = asyncio.ensure_future(conn.connect(**login))
+    event_loop.run_until_complete(connect_future)
+    return conn
+
+def _close_connection(connection):
+    asyncio.ensure_future(connection.disconnect())
