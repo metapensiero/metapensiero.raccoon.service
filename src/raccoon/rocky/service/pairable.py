@@ -108,7 +108,7 @@ class PairableNode(WAMPNode):
         logger.debug("Paired object at '%s' started.", self.node_path)
 
     async def stop(self):
-        logger.debug("Paired object ar '%s' stopped.", self.node_path)
+        logger.debug("Paired object at '%s' stopped.", self.node_path)
         self._pairable_notify_stop()
         self.pairing_active = False
         del self.node_context.peers
