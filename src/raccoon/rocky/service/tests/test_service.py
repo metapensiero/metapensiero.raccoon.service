@@ -10,7 +10,6 @@ from metapensiero import reactive
 from metapensiero.signal import Signal, handler
 from raccoon.rocky.node import Path
 
-from raccoon.rocky.node import WAMPNode
 from raccoon.rocky.node.wamp import call
 from raccoon.rocky.service.service import BaseService, ApplicationService
 from raccoon.rocky.service.session import SessionMember, bootstrap_session
