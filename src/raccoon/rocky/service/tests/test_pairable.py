@@ -83,3 +83,6 @@ async def test_role_paths(connection1, connection2, event_loop,
     foo_counter = await tc.bar.remote('#view').inc_counter()
     assert foo_counter == 1
     assert tc.bar._counter == 2
+    async with transaction.begin(event_loop):
+        s1.node_unbind()
+        tc.node_unbind()
