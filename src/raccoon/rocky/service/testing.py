@@ -24,7 +24,7 @@ import pytest
 import txaio
 
 from .wamp.connection import Connection
-
+from . import system, init_system
 
 def get_next_free_tcp_port():
     """Return the next free TCP port on the ``localhost`` interface."""
@@ -177,8 +177,17 @@ def setup_txaio(event_loop):
 def setup_reactive(event_loop):
     reactive.get_tracker().flusher.loop = event_loop
 
+@pytest.fixture(scope='session')
+def init_node_system():
+    init_system()
+
+@pytest.fixture
+def setup_system(init_node_system, event_loop):
+    system.node_context.loop = event_loop
+
 @pytest.yield_fixture
-def connection1(request, event_loop, ws_url, setup_txaio, setup_reactive):
+def connection1(request, event_loop, ws_url, setup_txaio, setup_reactive,
+                setup_system):
     kwargs = getattr(request, 'param', {'username': 'user1',
                                         'password': 'abc123'})
     conn = _create_connection(kwargs, event_loop, ws_url)
@@ -187,7 +196,8 @@ def connection1(request, event_loop, ws_url, setup_txaio, setup_reactive):
 
 
 @pytest.yield_fixture
-def connection2(request, event_loop, ws_url, setup_txaio, setup_reactive):
+def connection2(request, event_loop, ws_url, setup_txaio, setup_reactive,
+                setup_system):
     kwargs = getattr(request, 'param', {'username': 'user2',
                                         'password': 'abc123'})
     conn = _create_connection(kwargs, event_loop, ws_url)
