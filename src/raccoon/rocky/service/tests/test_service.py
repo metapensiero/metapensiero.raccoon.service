@@ -110,9 +110,10 @@ async def test_application_service(connection1, connection2, event_loop,
     s1 = MyAppService(MyApplication, Path('raccoon.appservice'))
     await s1.set_connection(connection1)
     await events.wait_for(events.app_started, 5)
-    tc = await bootstrap_session(connection2.new_context(),
-                                 'raccoon.appservice', TestClient,
-                                 'test')
+    ctx = connection2.new_context()
+    assert ctx.loop is event_loop
+    tc = await bootstrap_session(ctx, 'raccoon.appservice', TestClient,
+                                 'test', loop=event_loop)
     events.start_session.set()
     assert 'location' in tc.node_context and tc.node_context.location == 'test'
     counter = await tc.remote('@server').inc_counter()
@@ -121,8 +122,8 @@ async def test_application_service(connection1, connection2, event_loop,
     assert counter == 2
     # now create a new session
     tc2 = await bootstrap_session(connection2.new_context(),
-                                 'raccoon.appservice', TestClient,
-                                 'test')
+                                  'raccoon.appservice', TestClient,
+                                  'test', loop=event_loop)
     events.start_session2.set()
     assert 'location' in tc.node_context and tc.node_context.location == 'test'
     assert tc.node_context.session_id != tc2.node_context.session_id
