@@ -156,7 +156,7 @@ class SessionMember(PairableNode):
 
 
 async def bootstrap_session(wamp_context, service_uri, factory,
-                            location_name=None, session_id=None):
+                            location_name=None, session_id=None, loop=None):
     """Helper method to start a session in the right way. The factory passed in
     should create an instance which whose class is derived from
     `SessionMember`.
@@ -171,6 +171,7 @@ async def bootstrap_session(wamp_context, service_uri, factory,
       specify a session_id to join rather than start a new one.
     :returns: an instance of `SessionMember` that is part of the session
     """
+    loop = loop or asyncio.get_event_loop()
     location_name = location_name or 'client'
     session_starter = str(Path(service_uri) + 'start_session')
     wsession = wamp_context.wamp_session
@@ -180,7 +181,7 @@ async def bootstrap_session(wamp_context, service_uri, factory,
                                    pairing_request={'id': 0},
                                    session_id=session_info['id'])
     local_path = Path(session_info['location'], session_info['base'])
-    async with transaction.begin():
+    async with transaction.begin(loop):
         local_session_member = factory(session_ctx)
         assert isinstance(local_session_member, SessionMember)
         local_session_member.node_bind(local_path, session_ctx)
