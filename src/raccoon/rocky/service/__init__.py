@@ -5,11 +5,19 @@
 # :License:   GNU General Public License version 3 or later
 # :Copyright: Copyright (C) 2016 Arstecnica s.r.l.
 #
+
 from metapensiero import reactive
 from metapensiero.reactive.flush.asyncio import AsyncioFlushManager
 
 reactive.set_flusher_factory(AsyncioFlushManager)
 
+from raccoon.rocky.node import NodeContext
+from .node import Node, WAMPNode
 from .pairable import PairableNode
 from .service import BaseService, ApplicationService
 from .session import SessionRoot, SessionMember, bootstrap_session
+from . import system
+
+def init_system(context=None):
+    context = context or NodeContext()
+    system.node_bind('system', context)

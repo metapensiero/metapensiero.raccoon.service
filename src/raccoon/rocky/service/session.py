@@ -6,14 +6,16 @@
 # :Copyright: Copyright (C) 2016 Arstecnica s.r.l.
 #
 
+import asyncio
 import logging
 
 from metapensiero import reactive
 from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal, handler
-from raccoon.rocky.node import call, WAMPNode
+from raccoon.rocky.node import call
 from raccoon.rocky.node.path import Path
 
+from .node import WAMPNode
 from .pairable import PairableNode
 from .resolver import RolePathResolver
 

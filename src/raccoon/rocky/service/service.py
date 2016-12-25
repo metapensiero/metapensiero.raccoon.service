@@ -10,11 +10,13 @@ import logging
 
 from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal
-from raccoon.rocky.node import WAMPNode, WAMPNodeContext
+from raccoon.rocky.node import WAMPNodeContext
 from raccoon.rocky.node.path import Path
 from raccoon.rocky.node.wamp import call
 
+from .node import WAMPNode
 from .session import SessionRoot
+from . import system
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +55,7 @@ class BaseService(WAMPNode):
             context = node_context.new()
         else:
             context = WAMPNodeContext()
+        context.chain(system.node_context)
         self._tmp_context = context
         self.started = False
 
@@ -111,7 +114,7 @@ class ApplicationService(BaseService):
     factory with a tailored context.
     """
 
-    location_name = 'server'
+    location_name = system.name
 
     def __init__(self, factory, node_path, node_context=None):
         """

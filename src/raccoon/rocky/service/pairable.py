@@ -10,7 +10,7 @@ import logging
 
 from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal, handler
-from raccoon.rocky.node import WAMPNode
+from .node import WAMPNode
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,8 @@ class PairableNode(WAMPNode):
     """
 
     pairing_active = False
-    """Flag that it's true when the pairing is correctly setup and isn't stopped."""
+    """Flag that it's true when the pairing is correctly setup and isn't
+    stopped."""
 
     def __init__(self, context=None):
         self.node_context = context
