@@ -6,6 +6,7 @@
 #
 
 import pytest
+from metapensiero import reactive
 from metapensiero.signal import Signal, handler
 from raccoon.rocky.node import Path
 
@@ -84,6 +85,7 @@ async def test_application_service(connection1, connection2, event_loop,
     assert event_loop is asyncio.get_event_loop()
     assert connection1.loop is event_loop
     assert connection2.loop is event_loop
+    assert reactive.get_tracker().loop is event_loop
     events.define('app_started', 'start_session', 'start_session2',)
 
     class MyAppService(ApplicationService):
