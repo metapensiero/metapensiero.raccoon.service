@@ -23,6 +23,7 @@ async def test_start_service(connection1, event_loop):
     class MyService(BaseService):
 
         async def start_service(self, path, context):
+            await super().start_service(path, context)
             test_data['start'] = True
 
     my = MyService('raccoon.test.myservice')
