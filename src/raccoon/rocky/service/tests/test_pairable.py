@@ -59,7 +59,6 @@ async def test_role_paths(connection1, connection2, event_loop,
                 await self.remote('#bello').inc_counter()
                 await self.remote('#bello').inc_counter()
 
-
     class TestClient(SessionMember):
 
         async def start(self, start_info):
@@ -73,8 +72,6 @@ async def test_role_paths(connection1, connection2, event_loop,
             )
             async with transaction.begin():
                 self.bar = bar
-
-
 
     s1 = MyAppService(MyApplication, Path('raccoon.appservice'))
     await s1.set_connection(connection1)

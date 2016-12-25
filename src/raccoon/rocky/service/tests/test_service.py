@@ -14,6 +14,7 @@ from raccoon.rocky.node.wamp import call
 from raccoon.rocky.service.service import BaseService, ApplicationService
 from raccoon.rocky.service.session import SessionMember, bootstrap_session
 
+
 @pytest.mark.asyncio
 async def test_start_service(connection1, event_loop):
 
@@ -44,7 +45,6 @@ async def test_double_services(connection1, connection2, event_loop, events):
         def on_pong(self, details):
             events.pong.set()
 
-
         @handler('@service1.ping')
         def on_ping(self, details):
             events.ping.set()
@@ -68,7 +68,6 @@ async def test_double_services(connection1, connection2, event_loop, events):
     assert events.service2.is_set()
     assert s1.node_registered
     assert s2.node_registered
-
 
     # run the notification
     s1.ping.notify()
