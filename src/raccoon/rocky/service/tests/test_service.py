@@ -7,6 +7,7 @@
 
 import pytest
 from metapensiero import reactive
+from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal, handler
 from raccoon.rocky.node import Path
 
