@@ -69,7 +69,7 @@ class PairableNode(WAMPNode):
                 self.node_context.peers = peers
             self.pairing_active = True
             logger.debug("Pairing phase completed with peers: '%s'", peers)
-            await self.start(details)
+            await self.peer_start(details)
 
     @handler('on_info')
     async def handle_stop_message(self, *args, **kwargs):
@@ -77,7 +77,7 @@ class PairableNode(WAMPNode):
         msg_type = kwargs.get('msg_type', None)
         if msg_type == 'peer_stop' and self.pairing_active:
             self.pairing_active = False
-            await self.stop()
+            await self.peer_stop()
 
     @handler('on_node_registration_success')
     async def handle_registration_success(self, **_):
@@ -89,8 +89,10 @@ class PairableNode(WAMPNode):
         """
         pr = getattr(self.node_context, 'pairing_request', None)
         if pr and isinstance(pr, dict) and 'id' in pr:
+            # this peer is the one created in response to a pairing request
             pr_id = pr['id']
         else:
+            # this peer is the one who starts the pairing process
             pr_id = await self.remote('@pairing_request')(
                 self.node_context.location, pr
             )
@@ -105,13 +107,13 @@ class PairableNode(WAMPNode):
         }
         self.remote(self.node_path.base).on_info.notify(**msg)
 
-    async def start(self, start_info):
+    async def peer_start(self, start_info):
         logger.debug("Paired object at '%s' started.", self.node_path)
 
-    async def stop(self):
+    async def peer_stop(self):
         logger.debug("Paired object at '%s' stopped.", self.node_path)
         self._pairable_notify_stop()
         self.pairing_active = False
         del self.node_context.peers
-        async with transaction.begin():
+        async with transaction.begin(loop=self.loop):
             self.node_unbind()
