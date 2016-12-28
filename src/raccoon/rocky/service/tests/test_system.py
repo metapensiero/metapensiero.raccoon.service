@@ -5,16 +5,19 @@
 # :License: GNU General Public License version 3 or later
 #
 
+import pytest
+
 from metapensiero import reactive
 from raccoon.rocky.node import NodeContext
 from raccoon.rocky.service import system, Node
 
 
-def test_system_location(init_node_system):
+@pytest.mark.asyncio
+async def test_system_location(init_node_system, event_loop, setup_reactive):
     assert len(system.NODE_LOCATION) == 3
 
     n = Node()
-    n.node_bind('foo.bar', NodeContext())
+    n.node_bind('foo.bar', NodeContext(loop=event_loop))
     assert len(system.NODE_LOCATION) == 4
     assert n.node_resolve('foo.bar') is n
     assert n.node_resolve('system') is system
