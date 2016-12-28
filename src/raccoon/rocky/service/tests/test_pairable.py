@@ -35,7 +35,7 @@ async def test_role_paths(connection1, connection2, event_loop,
 
         async def create_new_peer(self, details):
             assert 'id' in details
-            async with transaction.begin():
+            async with transaction.begin(loop=event_loop):
                 foo = TestPairable(
                     self.node_context.new(
                         pairing_request = details,
@@ -70,7 +70,7 @@ async def test_role_paths(connection1, connection2, event_loop,
                     role='bello'
                 )
             )
-            async with transaction.begin():
+            async with transaction.begin(loop=event_loop):
                 self.bar = bar
 
     s1 = MyAppService(MyApplication, Path('raccoon.appservice'))
@@ -83,6 +83,6 @@ async def test_role_paths(connection1, connection2, event_loop,
     foo_counter = await tc.bar.remote('#view').inc_counter()
     assert foo_counter == 1
     assert tc.bar._counter == 2
-    async with transaction.begin(event_loop):
+    async with transaction.begin(loop=event_loop):
         s1.node_unbind()
         tc.node_unbind()

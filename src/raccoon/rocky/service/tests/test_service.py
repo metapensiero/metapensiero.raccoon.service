@@ -33,7 +33,7 @@ async def test_start_service(connection1, event_loop):
     assert test_data['start'] is True
 
     # teardown
-    async with transaction.begin(event_loop):
+    async with transaction.begin(loop=event_loop):
         my.node_unbind()
 
 
@@ -82,7 +82,7 @@ async def test_double_services(connection1, connection2, event_loop, events):
     assert events.pong.is_set()
 
     # teardown
-    async with transaction.begin(event_loop):
+    async with transaction.begin(loop=event_loop):
         s1.node_unbind()
         s2.node_unbind()
 
@@ -144,7 +144,7 @@ async def test_application_service(connection1, connection2, event_loop,
     await events.wait(timeout=5)
 
     # teardown
-    async with transaction.begin(event_loop):
+    async with transaction.begin(loop=event_loop):
         s1.node_unbind()
         tc.node_unbind()
         tc2.node_unbind()
