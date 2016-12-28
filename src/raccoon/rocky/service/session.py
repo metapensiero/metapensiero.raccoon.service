@@ -181,7 +181,7 @@ async def bootstrap_session(wamp_context, service_uri, factory,
                                    pairing_request={'id': 0},
                                    session_id=session_info['id'])
     local_path = Path(session_info['location'], session_info['base'])
-    async with transaction.begin(loop):
+    async with transaction.begin(loop=loop):
         local_session_member = factory(session_ctx)
         assert isinstance(local_session_member, SessionMember)
         local_session_member.node_bind(local_path, session_ctx)
