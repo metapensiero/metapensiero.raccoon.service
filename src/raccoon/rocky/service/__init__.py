@@ -19,6 +19,7 @@ from .session import SessionRoot, SessionMember, bootstrap_session
 from .user import User, AnonymousUser
 from . import system
 
+
 def init_system(context=None):
     context = context or NodeContext()
     system.node_bind('system', context)

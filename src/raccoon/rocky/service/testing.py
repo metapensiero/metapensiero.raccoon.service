@@ -26,6 +26,7 @@ import txaio
 from .wamp.connection import Connection
 from . import system, init_system
 
+
 def get_next_free_tcp_port():
     """Return the next free TCP port on the ``localhost`` interface."""
     with closing(socket.socket()) as sock:

@@ -12,6 +12,7 @@ from metapensiero.reactive import get_tracker
 from raccoon.rocky.node import Path
 from .node import Node
 
+
 class System(Node):
 
     NODE_LOCATION = {}
