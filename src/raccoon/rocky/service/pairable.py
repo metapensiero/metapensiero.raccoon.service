@@ -96,6 +96,7 @@ class PairableNode(WAMPNode):
             pr_id = await self.remote('@pairing_request')(
                 self.node_context.location, pr
             )
+        await self.peer_init()
         msg = {
             'msg_type': 'peer_ready',
             'msg_details': {
@@ -106,6 +107,9 @@ class PairableNode(WAMPNode):
             }
         }
         self.remote(self.node_path.base).on_info.notify(**msg)
+
+    async def peer_init(self):
+        logger.debug("Paired object at '%s' initialized.", self.node_path)
 
     async def peer_start(self, start_info):
         logger.debug("Paired object at '%s' started.", self.node_path)
