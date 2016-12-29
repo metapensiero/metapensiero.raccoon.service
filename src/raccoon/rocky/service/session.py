@@ -16,6 +16,7 @@ from raccoon.rocky.node import call
 from raccoon.rocky.node.path import Path
 
 from .node import WAMPNode
+from .message import Message
 from .pairable import PairableNode
 from .resolver import RolePathResolver
 
@@ -92,9 +93,9 @@ class SessionRoot(WAMPNode):
     @handler('on_info')
     def handle_pairing_message(self, *args, **kwargs):
         """Listens for messages of type 'peer_ready'"""
-        msg_type = kwargs.get('msg_type', None)
-        if msg_type == 'peer_ready':
-            details = kwargs['msg_details']
+        msg = Message.read(**kwargs)
+        if msg.msg_type == 'peer_ready':
+            details = msg.msg_details
             self._pairing_requests[details['id']].set_location_ready(**details)
 
     @reactive.computation
@@ -103,13 +104,10 @@ class SessionRoot(WAMPNode):
         for id, pr in self._pairing_requests.items():
             if pr.ready:
                 data = pr.serialize()
-                msg = {
-                    'msg_type': 'peer_start',
-                    'msg_details': data,
-                }
+                msg = Message(self, 'peer_start', **data)
                 for location in pr.locations:
                     p = Path(pr.location_info[location]['uri']) + 'on_info'
-                    self.remote(p).notify(**msg)
+                    msg.send(p)
                 to_remove.add(id)
                 if id == 0:
                     logger.info("session at '%s' is now active", self.node_path)
@@ -122,16 +120,10 @@ class SessionRoot(WAMPNode):
         pr = PairingRequest(self.locations, info)
         pr_id = self._new_pairing_id()
         self._pairing_requests[pr_id] = pr
-        msg = {
-            'msg_type': 'pairing_request',
-            'msg_details': {
-                'id': pr_id,
-                'info': info
-            }
-        }
+        msg = Message(self, 'pairing_request', id=pr_id, info=info)
         for loc in self.locations:
             if loc != src_location:
-                self.remote(self.node_path + loc).on_info.notify(**msg)
+                msg.send(self.node_path + loc + 'on_info')
         self.manage_pairings().invalidate()
         return pr_id
 
@@ -146,10 +138,9 @@ class SessionMember(PairableNode):
     @handler('on_info')
     async def handle_pairing_message(self, *args, **kwargs):
         """Listens for messages of type 'peer_ready'"""
-        msg_type = kwargs.get('msg_type', None)
-        if msg_type == 'pairing_request':
-            details = kwargs['msg_details']
-            await self.create_new_peer(details)
+        msg = Message.read(**kwargs)
+        if msg.msg_type == 'pairing_request':
+            await self.create_new_peer(msg.msg_details)
 
     async def create_new_peer(self, details):
         raise NotImplementedError("An incoming pairing request must be handled")

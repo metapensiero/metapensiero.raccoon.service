@@ -10,6 +10,7 @@ import logging
 
 from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal, handler
+from .message import Message
 from .node import WAMPNode
 
 logger = logging.getLogger(__name__)
@@ -49,10 +50,7 @@ class PairableNode(WAMPNode):
         if peers and self.pairing_active:
             for peer_role, peer_path in peers.items():
                 if peer_role != role:
-                    self.remote(peer_path).on_info.notify(
-                        msg_type='peer_stop',
-                        msg_details={'role': role}
-                    )
+                    Message(self, 'peer_stop', peer_path).send(role=role)
 
     @handler('on_info')
     async def handle_start_message(self, *args, **kwargs):
@@ -60,9 +58,9 @@ class PairableNode(WAMPNode):
         method and inject into the context informations about available peers
         that will be used in path resolution.
         """
-        msg_type = kwargs.get('msg_type', None)
-        if msg_type == 'peer_start':
-            details = kwargs['msg_details'].copy()
+        msg = Message.read(**kwargs)
+        if msg.msg_type == 'peer_start':
+            details = msg.msg_details
             peers = {l['role']: l['uri'] for l in details['locations'].values()
                      if l['role']}
             if peers:
@@ -74,8 +72,8 @@ class PairableNode(WAMPNode):
     @handler('on_info')
     async def handle_stop_message(self, *args, **kwargs):
         """Obey to the stop of the pairing signalled by one other peer."""
-        msg_type = kwargs.get('msg_type', None)
-        if msg_type == 'peer_stop' and self.pairing_active:
+        msg = Message.read(**kwargs)
+        if msg.msg_type == 'peer_stop' and self.pairing_active:
             self.pairing_active = False
             await self.peer_stop()
 
@@ -97,16 +95,12 @@ class PairableNode(WAMPNode):
                 self.node_context.location, pr
             )
         await self.peer_init()
-        msg = {
-            'msg_type': 'peer_ready',
-            'msg_details': {
-                'id': pr_id,
-                'location': self.node_context.location,
-                'uri': str(self.node_path),
-                'role': getattr(self.node_context, 'role', None)
-            }
-        }
-        self.remote(self.node_path.base).on_info.notify(**msg)
+        msg = Message(self, 'peer_ready',
+                      id=pr_id,
+                      location=self.node_context.location,
+                      uri=str(self.node_path),
+                      role=self.node_context.get('role'))
+        msg.send(self.node_path.base + 'on_info')
 
     async def peer_init(self):
         logger.debug("Paired object at '%s' initialized.", self.node_path)

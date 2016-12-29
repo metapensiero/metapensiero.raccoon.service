@@ -5,6 +5,7 @@
 # :License: GNU General Public License version 3 or later
 #
 
+from raccoon.rocky.node import call
 from raccoon.rocky import node
 
 
@@ -22,6 +23,15 @@ class ServiceNode:
 
     def node_depend(self):
         self.node_location.depend()
+
+    @call
+    def node_info(self, **_):
+        from . import system
+        return {
+            'uri': str(self.node_path),
+            'type': self.__class__.__name__,
+            'system': system.node_info()
+        }
 
     def node_resolve(self, uri):
         from . import system

@@ -21,6 +21,12 @@ class System(Node):
 
     name = 'server'
 
+    def node_info(self):
+        return {
+            'name': self.name,
+            'lang': 'Python'
+        }
+
     def register_node(self, node):
         assert hasattr(node, 'node_path') and \
             isinstance(node.node_path, Path) and \
