@@ -16,12 +16,12 @@ class RolePathResolver:
     `PairableNode`.
     """
 
-    def __call__(self, path, to_resolve, context):
+    def __call__(self, path, query, context):
         peers = context.get('peers')
-        if peers and to_resolve[0].startswith('#') and len(to_resolve[0]) > 1:
-            name = to_resolve[0][1:]
+        if peers and query[0].startswith('#') and len(query[0]) > 1:
+            name = query[0][1:]
             if name not in peers:
                 raise PathError("Asked to resolve a role '%s' but it's not in"
                                 " the peers", name)
-            peer_path = norm_path(peers[to_resolve[0][1:]])
-            return peer_path + to_resolve[1:]
+            peer_path = norm_path(peers[query[0][1:]])
+            return peer_path + query[1:]
