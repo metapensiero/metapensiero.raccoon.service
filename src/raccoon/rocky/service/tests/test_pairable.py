@@ -53,7 +53,7 @@ async def test_role_paths(connection1, connection2, event_loop,
             self._counter += 1
             return self._counter
 
-        async def start(self, start_info):
+        async def peer_start(self, start_info):
             events[self.node_context.role + '_started'].set()
             if self.node_context.role == 'view':
                 await self.remote('#bello').inc_counter()
@@ -61,8 +61,7 @@ async def test_role_paths(connection1, connection2, event_loop,
 
     class TestClient(SessionMember):
 
-        async def start(self, start_info):
-            events.start_session.set()
+        async def peer_start(self, start_info):
             # it should work w/o transaction
             bar = TestPairable(
                 self.node_context.new(
@@ -72,10 +71,12 @@ async def test_role_paths(connection1, connection2, event_loop,
             )
             async with transaction.begin(loop=event_loop):
                 self.bar = bar
+            events.start_session.set()
 
     s1 = MyAppService(MyApplication, Path('raccoon.appservice'))
     await s1.set_connection(connection1)
     await events.wait_for(events.app_started, 5)
+    assert events.app_started.is_set()
     tc = await bootstrap_session(connection2.new_context(),
                                  'raccoon.appservice', TestClient,
                                  'test')
