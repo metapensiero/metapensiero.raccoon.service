@@ -14,16 +14,30 @@ class Message:
     msg_type = None
     msg_dest = None
 
-    def __init__(self, source, type, dest=None, **kwargs):
+    def __init__(self, source, type_, dest=None, **kwargs):
         assert isinstance(source, ServiceNode)
         self._source = source
         self.msg_source = source.node_info()
-        self.msg_type = type
+        self.msg_type = type_
         if dest:
             self.msg_dest = self._resolve_destination(dest)
         else:
             self.msg_dest = None
         self.msg_details = kwargs
+
+    def __call__(self, dest=None, **kwargs):
+        if dest:
+            self.msg_dest = self._resolve_destination(dest)
+        self.msg_details.update(kwargs)
+        return {k: v for k, v in self.__dict__.items() if not
+                k.startswith('_')}
+
+    def __repr__(self):
+        return ("<{cls}, type: '{type_}', src: '{src}', "
+                "details: '{det}'".format(cls=self.__class__.__name__,
+                                          type_=self.msg_type,
+                                          src=self.msg_source['uri'],
+                                          det=self.msg_details))
 
     def _resolve_destination(self, dest):
         if isinstance(dest, Node):
@@ -34,13 +48,6 @@ class Message:
             dest = self._source.node_path.resolve(dest,
                                                   self._source._node_context)
         return dest
-
-    def __call__(self, dest=None, **kwargs):
-        if dest:
-            self.msg_dest = self._resolve_destination(dest)
-        self.msg_details.update(kwargs)
-        return {k: v for k, v in self.__dict__.items() if not
-                k.startswith('_')}
 
     @classmethod
     def read(cls, **kwargs):
