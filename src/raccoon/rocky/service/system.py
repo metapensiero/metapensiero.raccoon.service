@@ -78,10 +78,6 @@ class Location(metaclass=LocationMeta):
         self._active = False
         self._dependency.changed()
 
-    @property
-    def address(self):
-        return self._address
-
     def depend(self):
         self._dependency.depend()
 
