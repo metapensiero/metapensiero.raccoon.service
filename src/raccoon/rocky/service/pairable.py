@@ -59,8 +59,8 @@ class PairableNode(WAMPNode):
         that will be used in path resolution.
         """
         msg = Message.read(**kwargs)
-        if msg.msg_type == 'peer_start':
-            details = msg.msg_details
+        if msg.type == 'peer_start':
+            details = msg.details
             peers = {l['role']: l['uri'] for l in details['locations'].values()
                      if l['role']}
             if peers:
@@ -73,7 +73,7 @@ class PairableNode(WAMPNode):
     async def handle_stop_message(self, *args, **kwargs):
         """Obey to the stop of the pairing signalled by one other peer."""
         msg = Message.read(**kwargs)
-        if msg.msg_type == 'peer_stop' and self.pairing_active:
+        if msg.type == 'peer_stop' and self.pairing_active:
             self.pairing_active = False
             await self.peer_stop()
 

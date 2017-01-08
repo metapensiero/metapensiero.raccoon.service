@@ -94,8 +94,8 @@ class SessionRoot(WAMPNode):
     def handle_pairing_message(self, *args, **kwargs):
         """Listens for messages of type 'peer_ready'"""
         msg = Message.read(**kwargs)
-        if msg.msg_type == 'peer_ready':
-            details = msg.msg_details
+        if msg.type == 'peer_ready':
+            details = msg.details
             self._pairing_requests[details['id']].set_location_ready(**details)
 
     @reactive.computation
@@ -139,8 +139,8 @@ class SessionMember(PairableNode):
     async def handle_pairing_message(self, *args, **kwargs):
         """Listens for messages of type 'peer_ready'"""
         msg = Message.read(**kwargs)
-        if msg.msg_type == 'pairing_request':
-            await self.create_new_peer(msg.msg_details)
+        if msg.type == 'pairing_request':
+            await self.create_new_peer(msg.details)
 
     async def create_new_peer(self, details):
         raise NotImplementedError("An incoming pairing request must be handled")

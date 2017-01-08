@@ -10,34 +10,35 @@ from .node import ServiceNode
 
 class Message:
 
-    msg_source = None
-    msg_type = None
-    msg_dest = None
+    source = None
+    type = None
+    dest = None
+    misc = None
 
     def __init__(self, source, type_, dest=None, **kwargs):
         assert isinstance(source, ServiceNode)
         self._source = source
-        self.msg_source = source.node_info()
-        self.msg_type = type_
+        self.source = source.node_info()
+        self.type = type_
         if dest:
-            self.msg_dest = self._resolve_destination(dest)
+            self.dest = self._resolve_destination(dest)
         else:
-            self.msg_dest = None
-        self.msg_details = kwargs
+            self.dest = None
+        self.details = kwargs
 
     def __call__(self, dest=None, **kwargs):
         if dest:
-            self.msg_dest = self._resolve_destination(dest)
-        self.msg_details.update(kwargs)
-        return {k: v for k, v in self.__dict__.items() if not
+            self.dest = self._resolve_destination(dest)
+        self.details.update(kwargs)
+        return {'msg_{}'.format(k): v for k, v in self.__dict__.items() if not
                 k.startswith('_')}
 
     def __repr__(self):
         return ("<{cls}, type: '{type_}', src: '{src}', "
                 "details: '{det}'".format(cls=self.__class__.__name__,
-                                          type_=self.msg_type,
-                                          src=self.msg_source['uri'],
-                                          det=self.msg_details))
+                                          type_=self.type,
+                                          src=self.source['uri'],
+                                          det=self.details))
 
     def _resolve_destination(self, dest):
         if isinstance(dest, Node):
@@ -52,9 +53,16 @@ class Message:
     @classmethod
     def read(cls, **kwargs):
         new = cls.__new__(cls)
-        new.__dict__.update(kwargs)
+        misc = {}
+        for k, v in kwargs.items():
+            if k.startswith('msg_'):
+                new.__dict__[k[4:]] = v
+            else:
+                misc[k] = v
+        if len(misc):
+            new.__dict__['misc'] = misc
         return new
 
     def send(self, dest=None, **kwargs):
         data = self(dest=dest, **kwargs)
-        self._source.remote(self.msg_dest).notify(**data)
+        self._source.remote(self.dest).notify(**data)
