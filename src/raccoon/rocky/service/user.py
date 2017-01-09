@@ -14,14 +14,14 @@ ANONYMOUS = None
 
 class UserMeta(WAMPInitMeta):
 
-    def __call__(cls, user_id=None, login_id=None, user_name=None,
+    def __call__(cls, user_id=None, login=None, user_name=None,
                  source=None):
         global ANONYMOUS
         if user_id:
-            if not login_id and (not user_name or
+            if not login and (not user_name or
                 (user_name and user_name.lower() == 'anonymous')):
                 raise ValueError("Some fields are missing")
-            result = cls(user_id, login_id, user_name, source)
+            result = cls(user_id, login, user_name, source)
         else:
             if not ANONYMOUS:
                 ANONYMOUS = cls()
@@ -31,10 +31,10 @@ class UserMeta(WAMPInitMeta):
 
 class User(Node):
 
-    def __init__(self, user_id=None, login_id=None, user_name=None,
+    def __init__(self, user_id=None, login=None, user_name=None,
                  source=None):
         self.user_id = user_id
-        self.login_id = login_id
+        self.login = login
         self.user_name = user_name
         self.source = source
 
