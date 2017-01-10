@@ -29,7 +29,7 @@ class UserMeta(WAMPInitMeta):
         return result
 
 
-class User(Node):
+class User(Node, metaclass=UserMeta):
 
     def __init__(self, user_id=None, login=None, user_name=None,
                  source=None):
