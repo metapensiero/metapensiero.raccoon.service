@@ -79,9 +79,13 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
     async def on_connect(self, handler, subscribers, connect):
         """Call handler immediately if the session is attached already"""
         if self.connected:
-            await connect.notify(handler, session=self.session,
+            res = connect.notify(handler, session=self.session,
                                  session_details=self.session_details)
+        else:
+            res = self.loop.create_future()
+            res.set_result(None)
         connect(handler)
+        return res
 
     on_disconnect = Signal()
     "Signal emitted when the connection is deactivated."
@@ -90,8 +94,12 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
     async def on_disconnect(self, handler, subscribers, disconnect):
         """Call handler immediately if the session is attached already"""
         if not self.connected:
-            await disconnect.notify(handler, loop=self.loop)
+            res = disconnect.notify(handler, loop=self.loop)
+        else:
+            res = self.loop.create_future()
+            res.set_result(None)
         disconnect(handler)
+        return res
 
     def run(self):
         """Adds a ``SIGTERM`` handler and runs the loop until the connection
