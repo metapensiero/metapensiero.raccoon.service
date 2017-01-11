@@ -5,15 +5,44 @@
 # :License: GNU General Public License version 3 or later
 #
 
+from metapensiero.signal import Signal, SignalAndHandlerInitMeta
 from raccoon.rocky.node import call
 from raccoon.rocky import node
 
 
-class ServiceNode:
+class ServiceNode(metaclass=SignalAndHandlerInitMeta):
     """Base node for all the service stuff."""
 
     node_location = None
     """The location record"""
+
+    on_node_primary_signal = Signal()
+    """Signal used to receive 'infrastructure' messages. The messages that
+    implement the pairing protocol are of type 'pairing_request', 'peer_ready'
+    and 'peer_start'.
+    """
+    on_node_primary_signal.name = '.'
+
+    def _is_serializable(self, value):
+        return (value is None or value is True or value is False or
+                isinstance(value, (list, tuple, dict, int, float)))
+
+    def _node_children(self):
+        return {k:v for k, v in self.__dict__.items() if k != 'node_parent' and
+                isinstance(v, node.Node)}
+
+    def _node_description(self):
+        desc = {}
+        res = {
+            'info': self.node_info(),
+            'description': desc
+        }
+        if self.node_context:
+            for k, v in self.node_context.items():
+                if k not in self.node_context.CONFIG_KEYS and \
+                   self._is_serializable(v):
+                    desc[k] = v
+        return res
 
     def node_bind(self, path, context=None, parent=None):
         from . import system
@@ -24,7 +53,6 @@ class ServiceNode:
     def node_depend(self):
         self.node_location.depend()
 
-    @call
     def node_info(self, **_):
         from . import system
         return {
@@ -32,6 +60,18 @@ class ServiceNode:
             'type': self.__class__.__name__,
             'system': system.node_info()
         }
+
+    def node_primary_description(self, span=0, **_):
+        res = {
+            '.': self._node_description()
+        }
+        if span > 0:
+            for name, node_ in self._node_children().items():
+                if isinstance(node_, ServiceNode):
+                    res[name] = node_.node_primary_description(span=span-1)
+                else:
+                    res[name] = None
+        return res
 
     def node_resolve(self, uri):
         from . import system
@@ -53,4 +93,11 @@ class Node(ServiceNode, node.Node):
 
 
 class WAMPNode(ServiceNode, node.WAMPNode):
-    pass
+
+    @call
+    def node_info(self, **_):
+        return super().node_info()
+
+    @call('.')
+    def node_primary_description(self, span=0, **_):
+        return super().node_primary_description(span)

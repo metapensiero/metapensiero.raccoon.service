@@ -17,20 +17,20 @@ from raccoon.rocky.service.session import SessionMember, bootstrap_session
 
 
 @pytest.mark.asyncio
-async def test_start_service(connection1, event_loop):
+async def test_start_service(connection1, events, event_loop):
 
-    test_data = {'start': False}
+    events.define('start')
 
     class MyService(BaseService):
 
         async def start_service(self, path, context):
             await super().start_service(path, context)
-            test_data['start'] = True
+            events.start.set()
 
     my = MyService('raccoon.test.myservice')
     await my.set_connection(connection1)
 
-    assert test_data['start'] is True
+    assert events.start.wait()
 
     # teardown
     async with transaction.begin(loop=event_loop):

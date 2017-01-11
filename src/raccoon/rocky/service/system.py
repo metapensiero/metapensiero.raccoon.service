@@ -66,7 +66,7 @@ class Location(metaclass=LocationMeta):
         self._active = True
         self._key = node.node_path.absolute
         self._node = weakref.ref(node)
-        self._is_root = node.node_parent is not None
+        self._is_root = node.node_parent is None
         self._dependency = get_tracker().dependency(self)
         node.on_node_unbind.connect(self._on_node_unbind)
 
@@ -77,10 +77,6 @@ class Location(metaclass=LocationMeta):
         assert path.absolute is self._key, "Node changed path after bind"
         self._active = False
         self._dependency.changed()
-
-    @property
-    def address(self):
-        return self._address
 
     def depend(self):
         self._dependency.depend()

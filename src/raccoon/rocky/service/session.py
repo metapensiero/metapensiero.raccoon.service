@@ -16,7 +16,7 @@ from raccoon.rocky.node import call
 from raccoon.rocky.node.path import Path
 
 from .node import WAMPNode
-from .message import Message
+from .message import Message, on_message
 from .pairable import PairableNode
 from .resolver import RolePathResolver
 
@@ -55,7 +55,6 @@ class SessionRoot(WAMPNode):
     This object is coded to work with the ``SessionMember`` object.
     """
 
-    on_info = Signal()
     status = None
 
     def __init__(self, session_base_path, session_context, locations,
@@ -90,13 +89,11 @@ class SessionRoot(WAMPNode):
         res = self._pairing_counter
         return res
 
-    @handler('on_info')
-    def handle_pairing_message(self, *args, **kwargs):
+    @on_message('peer_ready')
+    def handle_pairing_message(self, msg):
         """Listens for messages of type 'peer_ready'"""
-        msg = Message.read(**kwargs)
-        if msg.msg_type == 'peer_ready':
-            details = msg.msg_details
-            self._pairing_requests[details['id']].set_location_ready(**details)
+        details = msg.details
+        self._pairing_requests[details['id']].set_location_ready(**details)
 
     @reactive.computation
     def manage_pairings(self, comp):
@@ -106,7 +103,7 @@ class SessionRoot(WAMPNode):
                 data = pr.serialize()
                 msg = Message(self, 'peer_start', **data)
                 for location in pr.locations:
-                    p = Path(pr.location_info[location]['uri']) + 'on_info'
+                    p = Path(pr.location_info[location]['uri'])
                     msg.send(p)
                 to_remove.add(id)
                 if id == 0:
@@ -123,7 +120,7 @@ class SessionRoot(WAMPNode):
         msg = Message(self, 'pairing_request', id=pr_id, info=info)
         for loc in self.locations:
             if loc != src_location:
-                msg.send(self.node_path + loc + 'on_info')
+                msg.send(self.node_path + loc)
         self.manage_pairings().invalidate()
         return pr_id
 
@@ -135,12 +132,10 @@ class SessionMember(PairableNode):
         context.path_resolvers.append(RolePathResolver())
         super().__init__(context)
 
-    @handler('on_info')
-    async def handle_pairing_message(self, *args, **kwargs):
+    @on_message('pairing_request')
+    async def handle_pairing_message(self, msg):
         """Listens for messages of type 'peer_ready'"""
-        msg = Message.read(**kwargs)
-        if msg.msg_type == 'pairing_request':
-            await self.create_new_peer(msg.msg_details)
+        await self.create_new_peer(msg.details)
 
     async def create_new_peer(self, details):
         raise NotImplementedError("An incoming pairing request must be handled")

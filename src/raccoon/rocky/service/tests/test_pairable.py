@@ -81,6 +81,7 @@ async def test_role_paths(connection1, connection2, event_loop,
                                  'raccoon.appservice', TestClient,
                                  'test')
     await events.wait(timeout=5)
+    assert events.start_session.is_set()
     foo_counter = await tc.bar.remote('#view').inc_counter()
     assert foo_counter == 1
     assert tc.bar._counter == 2
