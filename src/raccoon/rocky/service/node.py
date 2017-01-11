@@ -15,6 +15,13 @@ class ServiceNode:
     node_location = None
     """The location record"""
 
+    on_node_primary_signal = Signal()
+    """Signal used to receive 'infrastructure' messages. The messages that
+    implement the pairing protocol are of type 'pairing_request', 'peer_ready'
+    and 'peer_start'.
+    """
+    on_node_primary_signal.name = '.'
+
     def node_bind(self, path, context=None, parent=None):
         from . import system
         result = super().node_bind(path, context, parent)

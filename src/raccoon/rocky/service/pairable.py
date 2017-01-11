@@ -9,8 +9,8 @@
 import logging
 
 from metapensiero.asyncio import transaction
-from metapensiero.signal import Signal, handler
-from .message import Message
+from metapensiero.signal import handler
+from .message import Message, on_message
 from .node import WAMPNode
 
 logger = logging.getLogger(__name__)
@@ -31,12 +31,6 @@ class PairableNode(WAMPNode):
     correctly.
     """
 
-    on_info = Signal()
-    """Signal used to receive 'infrastructure' messages. The messages that
-    implement the pairing protocol are of type 'pairing_request', 'peer_ready'
-    and 'peer_start'.
-    """
-
     pairing_active = False
     """Flag that it's true when the pairing is correctly setup and isn't
     stopped."""
@@ -52,30 +46,26 @@ class PairableNode(WAMPNode):
                 if peer_role != role:
                     Message(self, 'peer_stop', peer_path).send(role=role)
 
-    @handler('on_info')
-    async def handle_start_message(self, *args, **kwargs):
+    @on_message('peer_start')
+    async def handle_start_message(self, msg):
         """When the pairing request is complete, automatically execute the 'start'
         method and inject into the context informations about available peers
         that will be used in path resolution.
         """
-        msg = Message.read(**kwargs)
-        if msg.type == 'peer_start':
-            details = msg.details
-            peers = {l['role']: l['uri'] for l in details['locations'].values()
-                     if l['role']}
-            if peers:
-                self.node_context.peers = peers
-            self.pairing_active = True
-            logger.debug("Pairing phase completed with peers: '%s'", peers)
-            await self.peer_start(details)
+        details = msg.details
+        peers = {l['role']: l['uri'] for l in details['locations'].values()
+                 if l['role']}
+        if peers:
+            self.node_context.peers = peers
+        self.pairing_active = True
+        logger.debug("Pairing phase completed with peers: '%s'", peers)
+        await self.peer_start(details)
 
-    @handler('on_info')
-    async def handle_stop_message(self, *args, **kwargs):
+    @on_message('peer_stop')
+    async def handle_stop_message(self, msg):
         """Obey to the stop of the pairing signalled by one other peer."""
-        msg = Message.read(**kwargs)
-        if msg.type == 'peer_stop' and self.pairing_active:
-            self.pairing_active = False
-            await self.peer_stop()
+        self.pairing_active = False
+        await self.peer_stop()
 
     @handler('on_node_registration_success')
     async def handle_registration_success(self, **_):
@@ -100,7 +90,7 @@ class PairableNode(WAMPNode):
                       location=self.node_context.location,
                       uri=str(self.node_path),
                       role=self.node_context.get('role'))
-        msg.send(self.node_path.base + 'on_info')
+        msg.send(self.node_path.base)
 
     async def peer_init(self):
         logger.debug("Paired object at '%s' initialized.", self.node_path)

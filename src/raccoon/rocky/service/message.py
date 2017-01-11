@@ -5,8 +5,12 @@
 # :License: GNU General Public License version 3 or later
 #
 
+from functools import wraps
+
+from metapensiero.signal import handler
 from raccoon.rocky.node import Node, Path
 from .node import ServiceNode
+
 
 class Message:
 
@@ -46,8 +50,8 @@ class Message:
         elif isinstance(dest, Path):
             dest = str(dest)
         else:
-            dest = self._source.node_path.resolve(dest,
-                                                  self._source._node_context)
+            dest = str(self._source.node_path.resolve(dest,
+                        self._source._node_context))
         return dest
 
     @classmethod
@@ -65,4 +69,20 @@ class Message:
 
     def send(self, dest=None, **kwargs):
         data = self(dest=dest, **kwargs)
-        self._source.remote(self.dest).notify(**data)
+        return self._source.remote(self.dest).notify(**data)
+
+
+def on_message(_type, signal='.'):
+
+    def wrap_func(func):
+
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            msg_type = kwargs.get('msg_type')
+            if msg_type == _type:
+                msg = Message.read(**kwargs)
+                return func(self, msg)
+
+        return handler(signal)(wrapper)
+
+    return wrap_func
