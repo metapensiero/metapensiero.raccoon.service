@@ -128,14 +128,12 @@ workers:
     roles:
     - name: authorized_users
       permissions:
-      - uri: raccoon
-        match: prefix
+      - uri: "*"
         allow: {call: true, publish: true, register: true, subscribe: true}
         disclose: {publisher: true, caller: true}
     - name: anonymous
       permissions:
-      - uri: raccoon
-        match: prefix
+      - uri: "*"
         allow: {call: true, publish: true, register: true, subscribe: true}
         disclose: {publisher: true, caller: true}
 
