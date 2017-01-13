@@ -6,7 +6,7 @@
 #
 
 from raccoon.rocky.node.wamp import WAMPInitMeta
-from .node import Node
+from .node import WAMPNode
 
 
 ANONYMOUS = None
@@ -21,15 +21,15 @@ class UserMeta(WAMPInitMeta):
             if not login and (not user_name or
                 (user_name and user_name.lower() == 'anonymous')):
                 raise ValueError("Some fields are missing")
-            result = cls(user_id, login, user_name, source)
+            result = super().__call__(user_id, login, user_name, source)
         else:
             if not ANONYMOUS:
-                ANONYMOUS = cls()
+                ANONYMOUS = super().__call__()
             result = ANONYMOUS
         return result
 
 
-class User(Node, metaclass=UserMeta):
+class User(WAMPNode, metaclass=UserMeta):
 
     def __init__(self, user_id=None, login=None, user_name=None,
                  source=None):
