@@ -23,5 +23,3 @@ from . import system
 def init_system(*, context=None, loop=None):
     context = context or NodeContext(loop=loop)
     system.node_bind('system', context)
-    system.users = Node()
-    system.users.anonymous = AnonymousUser
