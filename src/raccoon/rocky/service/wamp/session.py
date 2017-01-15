@@ -7,7 +7,6 @@
 #
 
 import logging
-import signal
 
 from arstecnica.raccoon.autobahn.client import ClientSession
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
