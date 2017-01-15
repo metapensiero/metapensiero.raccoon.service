@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# :Project:  raccoon.rocky.service -- wamp session class
-# :Created:  gio 24 mar 2016 20:33:15 CET
-# :Author:   Alberto Berti <alberto@metapensiero.it>
-# :License:  GNU General Public License version 3 or later
-# :Copyright: Copyright (C) 2016 Arstecnica s.r.l.
+# :Project:   raccoon.rocky.service -- wamp session class
+# :Created:   gio 24 mar 2016 20:33:15 CET
+# :Author:    Alberto Berti <alberto@metapensiero.it>
+# :License:   GNU General Public License version 3 or later
+# :Copyright: Copyright (C) 2016, 2017 Arstecnica s.r.l.
 #
 
 import logging

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# :Project: arstecnica.ytefas.appserver -- message
-# :Created: gio 29 dic 2016 02:25:10 CET
-# :Author:  Alberto Berti <alberto@metapensiero.it>
-# :License: GNU General Public License version 3 or later
+# :Project:   raccoon.rocky.service -- message
+# :Created:   gio 29 dic 2016 02:25:10 CET
+# :Author:    Alberto Berti <alberto@metapensiero.it>
+# :License:   GNU General Public License version 3 or later
+# :Copyright: Copyright (C) 2016, 2017 Arstecnica s.r.l.
 #
 
 from functools import wraps
