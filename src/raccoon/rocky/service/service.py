@@ -30,7 +30,7 @@ class BaseService(WAMPNode):
     on_start = Signal()
     """Signal emitted when the service starts. This happens when the
     connection has successfully joined the realm and the
-    ``session.is_attached()`` is ``True`` rather than a simple tcp
+    ``session.is_attached()`` is ``True`` rather than a simple TCP
     connection.
     """
 
@@ -68,8 +68,9 @@ class BaseService(WAMPNode):
         return self._connection
 
     def set_connection(self, connection):
-        """NOTE: This is not a coroutine but returns one, giving the chance to the
-        calling context to wait on it."""
+        """
+        NOTE: This is not a coroutine but returns one, giving the chance to
+        the calling context to wait on it."""
         self._connection = connection
         self._tmp_context.loop = connection.loop
         self.node_bind(self._tmp_path, self._tmp_context)
@@ -108,7 +109,8 @@ class BaseService(WAMPNode):
 
 
 class ApplicationService(BaseService):
-    """A service that publishes an api for the creation of long-running contexes.
+    """
+    A service that publishes an API for the creation of long-running contexes.
 
     Each time a long-running session starts, it executes the supplied
     factory with a tailored context.

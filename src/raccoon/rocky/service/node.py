@@ -16,13 +16,14 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
     """Base node for all the service stuff."""
 
     node_location = None
-    """The location record"""
+    """The location record."""
 
     on_node_primary_signal = Signal()
-    """Signal used to receive 'infrastructure' messages. The messages that
+    """Signal used to receive *infrastructure* messages. The messages that
     implement the pairing protocol are of type 'pairing_request', 'peer_ready'
     and 'peer_start'.
     """
+
     on_node_primary_signal.name = '.'
 
     def _is_serializable(self, value):
@@ -30,8 +31,8 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
                 isinstance(value, (list, tuple, dict, int, float)))
 
     def _node_children(self):
-        return {k:v for k, v in self.__dict__.items() if k != 'node_parent' and
-                isinstance(v, node.Node)}
+        return {k:v for k, v in self.__dict__.items()
+                if k != 'node_parent' and isinstance(v, node.Node)}
 
     def _node_description(self):
         desc = {}
@@ -105,14 +106,16 @@ class WAMPNode(ServiceNode, node.WAMPNode):
         return super().node_primary_description(span)
 
 
-def when_node(cond, *nodes):
-    """Return a computation that will evaluate a condition on one or more nodes
-    and that will be automatically re-executed when one of the nodes is marked as
-    changed."""
+def when_node(condition, *nodes):
+    """
+    Return a computation that will evaluate a `condition` on one or more
+    `nodes` and that will be automatically re-executed when one of the nodes
+    is marked as changed.
+    """
 
     def eval_condition(computation):
         for n in nodes:
             n.node_depend()
-        return cond(*nodes)
+        return condition(*nodes)
 
     return get_tracker().async_reactive(eval_condition, initial_value=False)

@@ -10,10 +10,12 @@ from raccoon.rocky.node.path import norm_path, PathError
 
 
 class RolePathResolver:
-    """Extend the path resolution machinery with a way to automatically resolve
-    peers from their role name. This uses a variable 'peers' which is present
-    on the context after pairing completes successfully. It's defined in
-    `PairableNode`.
+    """
+    Extend the path resolution machinery with a way to automatically resolve
+    peers from their role name.
+
+    This uses a member `peers` which is present on the context after pairing
+    completes successfully, defined by :class:`~.node.PairableNode`.
     """
 
     def __call__(self, path, query, context):

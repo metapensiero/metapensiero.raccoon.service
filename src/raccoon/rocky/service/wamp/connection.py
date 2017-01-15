@@ -50,7 +50,7 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
         return self._notify_disconnect()
 
     async def connect(self, username=None, password=None):
-        "Emits the ``on_connect`` signal."
+        "Emits the :attr:`on_connect` signal."
         session, sess_details = await super().connect(username, password,
                                                       session_class=Session)
         self.session = session
@@ -63,21 +63,24 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
 
     @property
     def connected(self):
-        """Returns ``True`` if if this connection is attached to a session."""
+        """Returns ``True`` if this connection is attached to a session."""
         return self.session is not None and self.session.is_attached()
 
     async def disconnect(self):
-        "Emits the ``on_disconnect`` signal."
+        "Emits the :attr:`on_disconnect` signal."
         await self._notify_disconnect()
         await super().disconnect()
 
     def new_context(self):
-        """Return a new `WAMPNodeContext` instance tied to this connection"""
+        """
+        Return a new :class:`~raccoon.rocky.node.node.WAMPNodeContext`
+        instance tied to this connection.
+        """
         return WAMPNodeContext(loop=self.loop, wamp_session=self.session)
 
     @on_connect.on_connect
     async def on_connect(self, handler, subscribers, connect):
-        """Call handler immediately if the session is attached already"""
+        """Call handler immediately if the session is attached already."""
         if self.connected:
             res = connect.notify(handler, session=self.session,
                                  session_details=self.session_details)
@@ -92,7 +95,7 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
 
     @on_disconnect.on_connect
     async def on_disconnect(self, handler, subscribers, disconnect):
-        """Call handler immediately if the session is attached already"""
+        """Call handler immediately if the session is already attached."""
         if not self.connected:
             res = disconnect.notify(handler, loop=self.loop)
         else:

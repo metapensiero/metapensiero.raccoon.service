@@ -17,15 +17,17 @@ logger = logging.getLogger(__name__)
 
 
 class PairableNode(WAMPNode):
-    """A node subclass that implements the 'slave' side protocol for pairing two
+    """
+    A node subclass that implements the *slave* side protocol for pairing two
     or more objects running in different locations. This to ensure that each
-    of the paired objects will execute its 'start' method when the other peers
-    are ready, and to give better addressability. Each member of the 'pair'
-    can declare a role and it will be addressable by using '#role' paths from
-    the others.
+    of the paired objects will execute its :meth:`start` method when the other
+    peers are ready, and to give better addressability.
 
-    The 'master' part of the protocol is implemented in the `SessionRoot`
-    object.
+    Each member of the *pair* can declare a role and it will be addressable by
+    using '#role' paths from the others.
+
+    The *master* part of the protocol is implemented by the
+    :class:`~.session.SessionRoot` object.
 
     This object needs the service and session infrastructure to operate
     correctly.
@@ -48,9 +50,10 @@ class PairableNode(WAMPNode):
 
     @on_message('peer_start')
     async def handle_start_message(self, msg):
-        """When the pairing request is complete, automatically execute the 'start'
-        method and inject into the context informations about available peers
-        that will be used in path resolution.
+        """
+        When the pairing request is complete, automatically execute the
+        :meth:`start` method and inject into the context information about
+        available peers that will be used in path resolution.
         """
         details = msg.details
         peers = {l['role']: l['uri'] for l in details['locations'].values()
@@ -71,11 +74,12 @@ class PairableNode(WAMPNode):
 
     @handler('on_node_registration_success')
     async def handle_registration_success(self, **_):
-        """When the registration is completed, check for the existence of a
-        'pairing_request' member on the node context. If that exists, either I
-        must start a new pairing or acknowledge one started already. This
-        depends on the presence of an 'id' property inside it. The id is
-        available only when acknowledging.
+        """
+        When the registration is completed, check for the existence of a
+        `pairing_request` member on the node context. If that exists, either
+        start a new pairing or acknowledge one started already. This depends
+        on the presence of an `id` property inside it. The id is available
+        only when acknowledging.
         """
         pr = getattr(self.node_context, 'pairing_request', None)
         if pr and isinstance(pr, dict) and 'id' in pr:

@@ -14,6 +14,7 @@ from .node import ServiceNode
 
 
 class Message:
+    "Message details carrier."
 
     source = None
     type = None
@@ -51,8 +52,8 @@ class Message:
         elif isinstance(dest, Path):
             dest = str(dest)
         else:
-            dest = str(self._source.node_path.resolve(dest,
-                        self._source._node_context))
+            src = self._source
+            dest = str(src.node_path.resolve(dest, src._node_context))
         return dest
 
     @classmethod
@@ -73,14 +74,18 @@ class Message:
         return self._source.remote(self.dest).notify(**data)
 
 
-def on_message(_type, signal='.'):
-
+def on_message(type_, signal='.'):
+    """Decorator for an handler method, to hook only to a particular `type_`
+    of message coming from a `signal`. The wrapped method will receive an
+    instance of :class:`Message` as the only argument, carrying all the
+    interesting details of the signal.
+    """
     def wrap_func(func):
 
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             msg_type = kwargs.get('msg_type')
-            if msg_type == _type:
+            if msg_type == type_:
                 msg = Message.read(**kwargs)
                 return func(self, msg)
 

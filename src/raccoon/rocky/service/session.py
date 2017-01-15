@@ -44,14 +44,14 @@ class PairingRequest:
 
 
 class SessionRoot(WAMPNode):
-    """The role of this object is to manage a session created by the service. For
-    now, it means ensure all the parties have successfully registered
-    themselves at the designed locations an to give a start to the chosen
+    """The role of this object is to manage a session created by the service.
+    For now, it means ensuring all the parties have successfully registered
+    themselves at the designed locations and to give a start to the chosen
     member.
 
-    Usually there are two members with the locations ``server`` and ``client``.
+    Usually there are two members with locations ``server`` and ``client``.
 
-    This object is coded to work with the ``SessionMember`` object.
+    This object is coded to work with the :class:`SessionMember` object.
     """
 
     status = None
@@ -59,15 +59,24 @@ class SessionRoot(WAMPNode):
     def __init__(self, session_base_path, session_context, locations,
                  local_location_name, local_member_factory):
         """
-        :param `Service` service: the service running this session
-        :param str session_base_path: a string with the uri of this session or a
-          `Path` instance containing the same information
-        :param `WAMPNodeContext` session_context: a context object with connection
-          infos
-        :param tuple locations: a tuple containing all the location names involved
-        :param str local_location_name: the location assumed by the *local* member
-        :param SessionMember local_member_factory: the node object class that
-          will fullfill the *local* location.
+        :type session_base_path: str
+        :param session_base_path: a string with the uri of this session or
+          a :class:`~raccoon.rocky.node.path.Path` instance containing the
+          same information
+        :type session_context:
+          :class:`~raccoon.rocky.node.context.WAMPNodeContext` instance
+        :param session_context: a context object with
+          connection info
+        :type locations: tuple
+        :param tuple locations: a tuple containing all the location names
+          involved
+        :type local_location_name: str
+        :param str local_location_name: the location assumed by the *local*
+          member
+        :type local_member_factory: callable returning a
+          :class:`SessionMember` instance
+        :param local_member_factory: the node object class that
+          will fulfill the *local* location.
         """
         self.locations = locations
         self.local_location_name = local_location_name
@@ -83,14 +92,14 @@ class SessionRoot(WAMPNode):
         self.manage_pairings()
 
     def _new_pairing_id(self):
-        """Generate a new pairing id"""
+        """Generate a new pairing id."""
         self._pairing_counter += 1
         res = self._pairing_counter
         return res
 
     @on_message('peer_ready')
     def handle_pairing_message(self, msg):
-        """Listens for messages of type 'peer_ready'"""
+        """Listens for messages of type 'peer_ready'."""
         details = msg.details
         self._pairing_requests[details['id']].set_location_ready(**details)
 
@@ -106,7 +115,8 @@ class SessionRoot(WAMPNode):
                     msg.send(p)
                 to_remove.add(id)
                 if id == 0:
-                    logger.info("session at '%s' is now active", self.node_path)
+                    logger.info("session at '%s' is now active",
+                                self.node_path)
                     self.status = 'active'
         for id in to_remove:
             del self._pairing_requests[id]
@@ -142,11 +152,13 @@ class SessionMember(PairableNode):
 
 async def bootstrap_session(wamp_context, service_uri, factory,
                             location_name=None, session_id=None, loop=None):
-    """Helper method to start a session in the right way. The factory passed in
-    should create an instance which whose class is derived from
-    `SessionMember`.
+    """Helper method to start a session in the right way. The `factory` passed
+    in should create an instance whose class is derived from
+    :class:`SessionMember`.
 
-    :param `WAMPNodeContext` wamp_context: a node context already connected
+    :type wamp_context: :class:`~raccoon.rocky.node.context.WAMPNodeContext`
+      instance
+    :param wamp_context: a node context already connected
     :param str service_uri: the path of the `ApplicationService` to call
     :param callable factory: a factory that will be called to produce the
       local member of the session
