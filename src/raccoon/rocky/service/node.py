@@ -5,6 +5,7 @@
 # :License: GNU General Public License version 3 or later
 #
 
+from metapensiero.reactive import get_tracker
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
 from raccoon.rocky.node import call
 from raccoon.rocky import node
@@ -101,3 +102,16 @@ class WAMPNode(ServiceNode, node.WAMPNode):
     @call('.')
     def node_primary_description(self, span=0, **_):
         return super().node_primary_description(span)
+
+
+def when_node(cond, *nodes):
+    """Return a computation that will evaluate a condition on one or more nodes
+    and that will be automatically re-executed when one of the nodes is marked as
+    changed."""
+
+    def eval_condition(computation):
+        for n in nodes:
+            n.node_depend()
+        return cond(*nodes)
+
+    return get_tracker().async_reactive(eval_condition, initial_value=False)

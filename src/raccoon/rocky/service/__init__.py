@@ -12,7 +12,7 @@ from metapensiero.reactive.flush.asyncio import AsyncioFlushManager
 reactive.set_flusher_factory(AsyncioFlushManager)
 
 from raccoon.rocky.node import NodeContext
-from .node import Node, WAMPNode
+from .node import Node, WAMPNode, when_node
 from .pairable import PairableNode
 from .service import BaseService, ApplicationService
 from .session import SessionRoot, SessionMember, bootstrap_session
