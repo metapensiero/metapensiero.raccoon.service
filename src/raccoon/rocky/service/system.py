@@ -76,6 +76,9 @@ class Location(metaclass=LocationMeta):
     def _on_node_unbind(self, node, path, parent):
         assert path.absolute is self._key, "Node changed path after bind"
         self._active = False
+        self.changed()
+
+    def changed(self):
         self._dependency.changed()
 
     def depend(self):
