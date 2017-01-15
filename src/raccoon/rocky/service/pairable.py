@@ -57,15 +57,17 @@ class PairableNode(WAMPNode):
                  if l['role']}
         if peers:
             self.node_context.peers = peers
-        self.pairing_active = True
         logger.debug("Pairing phase completed with peers: '%s'", peers)
         await self.peer_start(details)
+        self.pairing_active = True
+        self.node_location.changed()
 
     @on_message('peer_stop')
     async def handle_stop_message(self, msg):
         """Obey to the stop of the pairing signalled by one other peer."""
-        self.pairing_active = False
         await self.peer_stop()
+        self.pairing_active = False
+        self.node_location.changed()
 
     @handler('on_node_registration_success')
     async def handle_registration_success(self, **_):
