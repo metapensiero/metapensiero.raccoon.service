@@ -92,10 +92,15 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
 
 
 class Node(ServiceNode, node.Node):
-    pass
+    """A mix between a :class:`ServiceNode` and a
+    :class:`~raccoon.rocky.node.node.Node`.
+    """
 
 
 class WAMPNode(ServiceNode, node.WAMPNode):
+    """A mix between a :class:`ServiceNode` and a
+    :class:`~raccoon.rocky.node.node.WAMPNode`.
+    """
 
     @call
     def node_info(self, **_):

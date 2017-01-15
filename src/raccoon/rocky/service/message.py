@@ -14,7 +14,17 @@ from .node import ServiceNode
 
 
 class Message:
-    "Message details carrier."
+    """Message details carrier.
+
+    :type source: :class:`~.node.ServiceNode` instance
+    :param source: the sender of the message
+    :type type_: str
+    :param type_: the type of the message
+    :type dest: ``None``, :class:`~raccoon.rocky.node.node.Node` or
+      :class:`~raccoon.rocky.node.path.Path`
+    :param dest: the destination of the message
+    :param kwargs: message details
+    """
 
     source = None
     type = None
