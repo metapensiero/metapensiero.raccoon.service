@@ -39,11 +39,11 @@ class Message:
                 k.startswith('_')}
 
     def __repr__(self):
-        return ("<{cls}, type: '{type_}', src: '{src}', "
-                "details: '{det}'".format(cls=self.__class__.__name__,
-                                          type_=self.type,
-                                          src=self.source['uri'],
-                                          det=self.details))
+        return ("<{cls}, type: '{type}', src: '{src}',"
+                " details: '{det}'>".format(cls=self.__class__.__name__,
+                                            type=self.type,
+                                            src=self.source['uri'],
+                                            det=self.details))
 
     def _resolve_destination(self, dest):
         if isinstance(dest, Node):
