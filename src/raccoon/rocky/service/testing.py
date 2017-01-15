@@ -191,7 +191,7 @@ def connection1(request, event_loop, ws_url, setup_txaio, setup_reactive,
                                         'password': 'abc123'})
     conn = _create_connection(kwargs, event_loop, ws_url)
     yield conn
-    _close_connection(conn)
+    _close_connection(conn, event_loop)
 
 
 @pytest.yield_fixture
@@ -201,7 +201,7 @@ def connection2(request, event_loop, ws_url, setup_txaio, setup_reactive,
                                         'password': 'abc123'})
     conn = _create_connection(kwargs, event_loop, ws_url)
     yield conn
-    _close_connection(conn)
+    _close_connection(conn, event_loop)
 
 def _create_connection(login, event_loop, ws_url):
     conn = Connection(ws_url, 'default', loop=event_loop)
@@ -209,5 +209,5 @@ def _create_connection(login, event_loop, ws_url):
     event_loop.run_until_complete(connect_future)
     return conn
 
-def _close_connection(connection):
-    asyncio.ensure_future(connection.disconnect())
+def _close_connection(connection, loop):
+    loop.run_until_complete(connection.disconnect())
