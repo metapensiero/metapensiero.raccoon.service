@@ -28,7 +28,7 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
 
     def _is_serializable(self, value):
         return (value is None or value is True or value is False or
-                isinstance(value, (list, tuple, dict, int, float)))
+                isinstance(value, (list, tuple, dict, int, float, str)))
 
     def _node_children(self):
         return {k:v for k, v in self.__dict__.items()
