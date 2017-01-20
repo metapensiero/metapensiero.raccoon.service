@@ -81,6 +81,7 @@ class PairableNode(WAMPNode):
         on the presence of an `id` property inside it. The id is available
         only when acknowledging.
         """
+        await self.peer_init()
         pr = getattr(self.node_context, 'pairing_request', None)
         if pr and isinstance(pr, dict) and 'id' in pr:
             # this peer is the one created in response to a pairing request
@@ -90,7 +91,6 @@ class PairableNode(WAMPNode):
             pr_id = await self.remote('@pairing_request')(
                 self.node_context.location, pr
             )
-        await self.peer_init()
         msg = Message(self, 'peer_ready',
                       id=pr_id,
                       location=self.node_context.location,
