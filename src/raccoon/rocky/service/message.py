@@ -63,7 +63,7 @@ class Message:
             dest = str(dest)
         else:
             src = self._source
-            dest = str(src.node_path.resolve(dest, src._node_context))
+            dest = str(src.node_path.resolve(dest, src.node_context))
         return dest
 
     @classmethod
