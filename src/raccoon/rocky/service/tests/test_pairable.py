@@ -6,7 +6,6 @@
 #
 
 import pytest
-from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal, handler
 from raccoon.rocky.node import Path
 
@@ -35,14 +34,13 @@ async def test_role_paths(connection1, connection2, event_loop,
 
         async def create_new_peer(self, details):
             assert 'id' in details
-            async with transaction.begin(loop=event_loop):
-                foo = TestPairable(
-                    self.node_context.new(
-                        pairing_request = details,
-                        role='view'
-                    )
+            foo = TestPairable(
+                self.node_context.new(
+                    pairing_request = details,
+                    role='view'
                 )
-                self.foo = foo
+            )
+            await self.node_add('foo', foo)
 
     class TestPairable(PairableNode):
 
@@ -69,8 +67,7 @@ async def test_role_paths(connection1, connection2, event_loop,
                     role='bello'
                 )
             )
-            async with transaction.begin(loop=event_loop):
-                self.bar = bar
+            await self.node_add('bar', bar)
             events.start_session.set()
 
     s1 = MyAppService(MyApplication, Path('raccoon.appservice'))
@@ -85,6 +82,5 @@ async def test_role_paths(connection1, connection2, event_loop,
     foo_counter = await tc.bar.remote('#view').inc_counter()
     assert foo_counter == 1
     assert tc.bar._counter == 2
-    async with transaction.begin(loop=event_loop):
-        s1.node_unbind()
-        tc.node_unbind()
+    await s1.node_unbind()
+    await tc.node_unbind()

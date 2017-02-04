@@ -101,7 +101,7 @@ def launch_adhoc_crossbar(config):
     :return: the automatically selected port
 
     """
-
+    start = time.time()
     # Get the next available TCP port
     port = get_next_free_tcp_port()
 
@@ -113,6 +113,8 @@ def launch_adhoc_crossbar(config):
         f.write(config % {'port': port})
 
     launch_crossbar(tempdir)
+    elapsed = time.time() - start
+    print('Starting Crossbar took %s seconds.' % elapsed)
     return port
 
 
@@ -176,9 +178,10 @@ def setup_txaio(event_loop):
 def setup_reactive(event_loop):
     reactive.get_tracker().flusher.loop = event_loop
 
-@pytest.fixture(scope='session')
-def init_node_system():
-    init_system()
+@pytest.fixture
+def init_node_system(event_loop):
+    if not system.node_path:
+        event_loop.run_until_complete(init_system())
 
 @pytest.fixture
 def setup_system(init_node_system, event_loop):

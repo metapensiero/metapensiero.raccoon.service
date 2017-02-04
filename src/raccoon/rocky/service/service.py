@@ -8,7 +8,6 @@
 
 import logging
 
-from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal
 from raccoon.rocky.node import WAMPNodeContext
 from raccoon.rocky.node.path import Path
@@ -67,25 +66,20 @@ class BaseService(WAMPNode):
         """
         return self._connection
 
-    def set_connection(self, connection):
-        """
-        NOTE: This is not a coroutine but returns one, giving the chance to
-        the calling context to wait on it."""
+    async def set_connection(self, connection):
+        """Set the wamp connection."""
         self._connection = connection
         self._tmp_context.loop = connection.loop
-        self.node_bind(self._tmp_path, self._tmp_context)
-        del self._tmp_path, self._tmp_context
-        # this is a coroutine but we cant await here, this method probably
-        # gets called inside an __init__(). the signal machinery schedules it
-        # anyway
-        res = connection.on_connect.connect(self._on_connection_connected)
-        return res
+        await connection.on_connect.connect(self._on_connection_connected)
 
     async def _on_connection_connected(self, session, session_details,
                                        **kwargs):
-        self.node_context.wamp_session = session
-        self.node_context.wamp_details = session_details
-        await self.start_service(self.node_path, self.node_context)
+        path, context = self._tmp_path, self._tmp_context
+        del self._tmp_path, self._tmp_context
+        context.wamp_session = session
+        context.wamp_details = session_details
+        await self.node_bind(path, context)
+        await self.start_service(path, context)
         self.started = True
         await self.on_start.notify(local_path=self.node_path,
                                    local_context=self.node_context)
@@ -101,10 +95,6 @@ class BaseService(WAMPNode):
         :type context: A :py:class:`.context.GlobalContext`
 
         """
-        async with transaction.begin():
-            self.node_register()
-            # ensure that all the registrations have completed after this
-            # point
         logger.debug("Service at %r started", self.node_path)
 
 
@@ -143,11 +133,10 @@ class ApplicationService(BaseService):
         session_ctx.session_id = session_id
         session_path = Path(self.node_path + session_id)
         session_path.base = session_path
-        async with transaction.begin():
-            sess = SessionRoot(session_path, session_ctx,
-                               locations=[from_location, self.location_name],
-                               local_location_name=self.location_name,
-                               local_member_factory=self._factory)
+        sess = SessionRoot(locations=[from_location, self.location_name],
+                           local_location_name=self.location_name,
+                           local_member_factory=self._factory)
+        await sess.node_bind(session_path, session_ctx, self)
         return sess
 
     @call

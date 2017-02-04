@@ -8,7 +8,6 @@
 
 import logging
 
-from metapensiero.asyncio import transaction
 from metapensiero.signal import handler
 from .message import Message, on_message
 from .node import WAMPNode
@@ -72,7 +71,7 @@ class PairableNode(WAMPNode):
         self.pairing_active = False
         self.node_location.changed()
 
-    @handler('on_node_registration_success')
+    @handler('on_node_bind')
     async def handle_registration_success(self, **_):
         """
         When the registration is completed, check for the existence of a
@@ -109,5 +108,4 @@ class PairableNode(WAMPNode):
         self._pairable_notify_stop()
         self.pairing_active = False
         del self.node_context.peers
-        async with transaction.begin(loop=self.loop):
-            self.node_unbind()
+        await self.node_unbind()

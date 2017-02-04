@@ -10,7 +10,7 @@ import asyncio
 import logging
 
 from metapensiero import reactive
-from metapensiero.asyncio import transaction
+from metapensiero.signal import handler
 from raccoon.rocky.node import call
 from raccoon.rocky.node.path import Path
 
@@ -56,17 +56,8 @@ class SessionRoot(WAMPNode):
 
     status = None
 
-    def __init__(self, session_base_path, session_context, locations,
-                 local_location_name, local_member_factory):
+    def __init__(self, locations, local_location_name, local_member_factory):
         """
-        :type session_base_path: str
-        :param session_base_path: a string with the uri of this session or
-          a :class:`~raccoon.rocky.node.path.Path` instance containing the
-          same information
-        :type session_context:
-          :class:`~raccoon.rocky.node.context.WAMPNodeContext` instance
-        :param session_context: a context object with
-          connection info
         :type locations: tuple
         :param tuple locations: a tuple containing all the location names
           involved
@@ -82,14 +73,8 @@ class SessionRoot(WAMPNode):
         self.local_location_name = local_location_name
         self._pairing_requests = {}
         self._pairing_counter = 0
-        self.node_bind(session_base_path, session_context,
-                       session_context.service)
         self._pairing_requests[0] = PairingRequest(locations)
-        member_context = session_context.new(location=local_location_name,
-                                             pairing_request={'id': 0})
-        local_member = local_member_factory(member_context)
-        setattr(self, local_location_name, local_member)
-        self.manage_pairings()
+        self._local_member_factory = local_member_factory
 
     def _new_pairing_id(self):
         """Generate a new pairing id."""
@@ -123,6 +108,7 @@ class SessionRoot(WAMPNode):
 
     @call
     async def pairing_request(self, src_location, info, **_):
+        """Start a new pairing of two or more objects."""
         pr = PairingRequest(self.locations, info)
         pr_id = self._new_pairing_id()
         self._pairing_requests[pr_id] = pr
@@ -132,6 +118,15 @@ class SessionRoot(WAMPNode):
                 msg.send(self.node_path + loc)
         self.manage_pairings().invalidate()
         return pr_id
+
+    @handler('on_node_bind')
+    async def start(self, **_):
+        """Start the bounded session."""
+        member_context = self.node_context.new(location=self.local_location_name,
+                                               pairing_request={'id': 0})
+        local_member = self._local_member_factory(member_context)
+        await self.node_add(self.local_location_name, local_member)
+        self.manage_pairings()
 
 
 class SessionMember(PairableNode):
@@ -178,8 +173,7 @@ async def bootstrap_session(wamp_context, service_uri, factory,
                                    pairing_request={'id': 0},
                                    session_id=session_info['id'])
     local_path = Path(session_info['location'], session_info['base'])
-    async with transaction.begin(loop=loop):
-        local_session_member = factory(session_ctx)
-        assert isinstance(local_session_member, SessionMember)
-        local_session_member.node_bind(local_path, session_ctx)
+    local_session_member = factory(session_ctx)
+    assert isinstance(local_session_member, SessionMember)
+    await local_session_member.node_bind(local_path, session_ctx)
     return local_session_member

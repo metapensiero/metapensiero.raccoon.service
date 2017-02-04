@@ -47,11 +47,15 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
                     desc[k] = v
         return res
 
-    def node_bind(self, path, context=None, parent=None):
+    async def _node_unbind(self):
         from . import system
-        result = super().node_bind(path, context, parent)
+        await super()._node_unbind()
+        system.unregister_node(self)
+
+    async def _node_bind(self, path, context=None, parent=None):
+        from . import system
+        await super()._node_bind(path, context, parent)
         self.node_location = system.register_node(self)
-        return result
 
     def node_depend(self):
         self.node_location.depend()
@@ -83,12 +87,6 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
         else:
             uri = str(self.node_path.resolve(uri, self.node_context))
         return system.resolve(uri)
-
-    def node_unbind(self):
-        from . import system
-        result = super().node_unbind()
-        system.unregister_node(self)
-        return result
 
 
 class Node(ServiceNode, node.Node):

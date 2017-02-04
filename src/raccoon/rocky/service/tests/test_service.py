@@ -7,7 +7,6 @@
 
 import pytest
 from metapensiero import reactive
-from metapensiero.asyncio import transaction
 from metapensiero.signal import Signal, handler
 from raccoon.rocky.node import Path
 
@@ -30,11 +29,11 @@ async def test_start_service(connection1, events, event_loop):
     my = MyService('raccoon.test.myservice')
     await my.set_connection(connection1)
 
-    assert events.start.wait()
+    await events.wait_for(events.start, 3)
+    assert events.start.is_set()
 
     # teardown
-    async with transaction.begin(loop=event_loop):
-        my.node_unbind()
+    await my.node_unbind()
 
 
 @pytest.mark.asyncio
@@ -82,9 +81,8 @@ async def test_double_services(connection1, connection2, event_loop, events):
     assert events.pong.is_set()
 
     # teardown
-    async with transaction.begin(loop=event_loop):
-        s1.node_unbind()
-        s2.node_unbind()
+    await s1.node_unbind()
+    await s2.node_unbind()
 
 
 @pytest.mark.asyncio
@@ -144,7 +142,6 @@ async def test_application_service(connection1, connection2, event_loop,
     await events.wait(timeout=5)
 
     # teardown
-    async with transaction.begin(loop=event_loop):
-        s1.node_unbind()
-        tc.node_unbind()
-        tc2.node_unbind()
+    await s1.node_unbind()
+    await tc.node_unbind()
+    await tc2.node_unbind()

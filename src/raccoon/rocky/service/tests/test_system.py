@@ -17,7 +17,7 @@ async def test_system_location(init_node_system, event_loop, setup_reactive):
     assert len(system.NODE_LOCATION) == 1
 
     n = Node()
-    n.node_bind('foo.bar', NodeContext(loop=event_loop))
+    await n.node_bind('foo.bar', NodeContext(loop=event_loop))
     assert len(system.NODE_LOCATION) == 2
     assert n.node_resolve('foo.bar') is n
     assert n.node_resolve('system') is system
@@ -34,7 +34,7 @@ async def test_system_location(init_node_system, event_loop, setup_reactive):
 
     assert calls == 1
 
-    n.node_unbind()
+    await n.node_unbind()
     assert len(system.NODE_LOCATION) == 1
 
     assert computation.invalidated

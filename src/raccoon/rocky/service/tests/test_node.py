@@ -5,7 +5,6 @@
 # :License:  GNU General Public License version 3 or later
 #
 
-from metapensiero.asyncio import transaction
 import pytest
 
 from raccoon.rocky.service import WAMPNode
@@ -25,9 +24,8 @@ async def test_primary_description(connection1, events, event_loop):
         nonlocal sess
         sess = session
 
-        async with transaction.begin():
-            n1.node_bind('raccoon.primary.test', connection1.new_context())
-            n1.n2 = n2
+        await n1.node_bind('raccoon.primary.test', connection1.new_context())
+        await n1.node_add('n2', n2)
 
         events.done.set()
 
@@ -58,5 +56,4 @@ async def test_primary_description(connection1, events, event_loop):
                                    'type': 'WAMPNode',
                                    'uri': 'raccoon.primary.test'}}}
 
-    async with transaction.begin():
-        n1.node_unbind()
+    await n1.node_unbind()
