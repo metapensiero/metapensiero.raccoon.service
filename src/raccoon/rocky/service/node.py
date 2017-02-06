@@ -57,6 +57,9 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
         await super()._node_bind(path, context, parent)
         self.node_location = system.register_node(self)
 
+    def node_changed(self):
+        self.node_location.changed()
+
     def node_depend(self):
         self.node_location.depend()
 
