@@ -3,13 +3,13 @@
 # :Created:   gio 24 mar 2016, 19.20.15, CET
 # :Author:    Alberto Berti <alberto@arstecnica.it>
 # :License:   GNU General Public License version 3 or later
-# :Copyright: Copyright (C) 2016 Arstecnica s.r.l.
+# :Copyright: Copyright (C) 2016, 2017 Arstecnica s.r.l.
 #
 
-from io import open
 import os
 
 from setuptools import setup, find_packages
+
 
 here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
@@ -19,13 +19,14 @@ with open(os.path.join(here, 'CHANGES.rst'), encoding='utf-8') as f:
 with open(os.path.join(here, 'version.txt'), encoding='utf-8') as f:
     VERSION = f.read().strip()
 
+
 setup(
     name="raccoon.rocky.service",
     version=VERSION,
     url="https://gitlab.com/arstecnica/raccoon.rocky.service",
 
     description="Service classes for Rocky",
-    long_description=README + u'\n\n' + CHANGES,
+    long_description=README + '\n\n' + CHANGES,
 
     author="Alberto Berti",
     author_email="alberto@arstecnica.it",
