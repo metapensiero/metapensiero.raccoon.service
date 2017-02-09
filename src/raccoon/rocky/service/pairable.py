@@ -10,12 +10,12 @@ import logging
 
 from metapensiero.signal import handler
 from .message import Message, on_message
-from .node import WAMPNode
+from .node import ContextNode
 
 logger = logging.getLogger(__name__)
 
 
-class PairableNode(WAMPNode):
+class PairableNode(ContextNode):
     """
     A node subclass that implements the *slave* side protocol for pairing two
     or more objects running in different locations. This to ensure that each
@@ -36,9 +36,9 @@ class PairableNode(WAMPNode):
     """Flag that it's true when the pairing is correctly setup and isn't
     stopped."""
 
-    def __init__(self, context=None, **kwargs):
-        super().__init__(**kwargs)
-        self.node_context = context
+    def __init__(self, *maps, node_context=None):
+        super().__init__(*maps)
+        self.node_context = node_context
 
     def _pairable_notify_stop(self):
         role = self.node_context.get('role')

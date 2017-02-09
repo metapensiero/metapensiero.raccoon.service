@@ -13,14 +13,14 @@ from raccoon.rocky.node import WAMPNodeContext
 from raccoon.rocky.node.path import Path
 from raccoon.rocky.node.wamp import call
 
-from .node import WAMPNode
+from .node import ContextNode
 from .session import SessionRoot
 from . import system
 
 logger = logging.getLogger(__name__)
 
 
-class BaseService(WAMPNode):
+class BaseService(ContextNode):
     """A simple class tailored to the needs of setting up some tree of
     endpoints immediately available as soon as the wamp connection is
     established.
@@ -130,11 +130,12 @@ class ApplicationService(BaseService):
 
     async def _create_session(self, session_id, from_location):
         session_ctx = self.node_context.new()
-        session_ctx.service = self
         session_ctx.session_id = session_id
         session_path = Path(self.node_path + session_id)
         session_path.base = session_path
-        sess = SessionRoot(locations=[from_location, self.location_name],
+        sess = SessionRoot(*self.new_context(service=self,
+                                             session_id=session_id),
+                           locations=[from_location, self.location_name],
                            local_location_name=self.location_name,
                            local_member_factory=self._factory)
         await sess.node_bind(session_path, session_ctx, self)

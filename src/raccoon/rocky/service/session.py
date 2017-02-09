@@ -14,7 +14,7 @@ from metapensiero.signal import handler
 from raccoon.rocky.node import call
 from raccoon.rocky.node.path import Path
 
-from .node import WAMPNode
+from .node import ContextNode
 from .message import Message, on_message
 from .pairable import PairableNode
 from .resolver import RolePathResolver
@@ -43,7 +43,7 @@ class PairingRequest:
         return {'locations': self.location_info, 'details': self.details}
 
 
-class SessionRoot(WAMPNode):
+class SessionRoot(ContextNode):
     """The role of this object is to manage a session created by the service.
     For now, it means ensuring all the parties have successfully registered
     themselves at the designed locations and to give a start to the chosen
@@ -56,8 +56,10 @@ class SessionRoot(WAMPNode):
 
     status = None
 
-    def __init__(self, locations, local_location_name, local_member_factory):
+    def __init__(self, *maps, locations, local_location_name,
+                 local_member_factory):
         """
+        :param maps: a list of maps that will form the global context.
         :type locations: tuple
         :param tuple locations: a tuple containing all the location names
           involved
@@ -69,7 +71,7 @@ class SessionRoot(WAMPNode):
         :param local_member_factory: the node object class that
           will fulfill the *local* location.
         """
-        super().__init__()
+        super().__init__(*maps)
         self.locations = locations
         self.local_location_name = local_location_name
         self._pairing_requests = {}
@@ -107,6 +109,17 @@ class SessionRoot(WAMPNode):
         for id in to_remove:
             del self._pairing_requests[id]
 
+    async def node_bind(self, path, context, parent=None):
+        """Just to customize incoming context."""
+        assert context is not None
+        self.node_context = nc = context.new()
+        for pr in nc.path_resolvers:
+            if isinstance(pr, RolePathResolver):
+                break
+        else:
+            nc.path_resolvers.append(RolePathResolver())
+        await super().node_bind(path, context, parent)
+
     @call
     async def pairing_request(self, src_location, info, **_):
         """Start a new pairing of two or more objects."""
@@ -123,19 +136,16 @@ class SessionRoot(WAMPNode):
     @handler('on_node_bind')
     async def start(self, **_):
         """Start the bounded session."""
+        self.globals['user'] = None
         member_context = self.node_context.new(location=self.local_location_name,
                                                pairing_request={'id': 0})
-        local_member = self._local_member_factory(member_context)
+        local_member = self._local_member_factory(*self.new_context(),
+                                                  node_context=member_context)
         await self.node_add(self.local_location_name, local_member)
         self.manage_pairings()
 
 
 class SessionMember(PairableNode):
-
-    def __init__(self, context):
-        assert context
-        context.path_resolvers.append(RolePathResolver())
-        super().__init__(context)
 
     @on_message('pairing_request')
     async def handle_pairing_message(self, msg):
