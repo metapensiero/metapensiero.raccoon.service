@@ -50,6 +50,7 @@ setup(
         'arstecnica.raccoon.autobahn',
         'raccoon.rocky.node',
         'metapensiero.signal>=0.9',
+        'metapensiero.reactive',
     ],
     extras_require={
         'dev': [
@@ -60,7 +61,7 @@ setup(
             'pytest',
             'pytest-asyncio',
             'crossbar>=0.13',
-            'raccoon.rocky.node[test]'
+            'raccoon.rocky.node[test]',
         ]
     },
     setup_requires=['pytest-runner'],

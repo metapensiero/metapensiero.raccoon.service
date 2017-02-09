@@ -36,7 +36,8 @@ class PairableNode(WAMPNode):
     """Flag that it's true when the pairing is correctly setup and isn't
     stopped."""
 
-    def __init__(self, context=None):
+    def __init__(self, context=None, **kwargs):
+        super().__init__(**kwargs)
         self.node_context = context
 
     def _pairable_notify_stop(self):

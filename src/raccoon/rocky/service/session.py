@@ -69,6 +69,7 @@ class SessionRoot(WAMPNode):
         :param local_member_factory: the node object class that
           will fulfill the *local* location.
         """
+        super().__init__()
         self.locations = locations
         self.local_location_name = local_location_name
         self._pairing_requests = {}

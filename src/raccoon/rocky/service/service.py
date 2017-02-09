@@ -48,6 +48,7 @@ class BaseService(WAMPNode):
         :type node_context: An instance of
           :class:`~raccoon.rocky.node.context.WAMPContext`
         """
+        super().__init__()
         self._connection = None
         self._tmp_path = node_path
         if node_context:

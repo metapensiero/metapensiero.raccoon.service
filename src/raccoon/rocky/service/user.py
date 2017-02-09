@@ -6,14 +6,13 @@
 # :Copyright: Copyright (C) 2016, 2017 Arstecnica s.r.l.
 #
 
-from raccoon.rocky.node.wamp import WAMPInitMeta
-from .node import WAMPNode
+from .node import WAMPNode, ABCWAMPMeta
 
 
 ANONYMOUS = None
 
 
-class UserMeta(WAMPInitMeta):
+class UserMeta(ABCWAMPMeta):
 
     def __call__(cls, user_id=None, login=None, user_name=None,
                  source=None):
@@ -34,6 +33,7 @@ class User(WAMPNode, metaclass=UserMeta):
 
     def __init__(self, user_id=None, login=None, user_name=None,
                  source=None):
+        super().__init__()
         self.user_id = user_id
         self.login = login
         self.user_name = user_name

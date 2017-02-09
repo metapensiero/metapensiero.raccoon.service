@@ -6,7 +6,7 @@
 #
 
 import pytest
-from metapensiero.signal import Signal, handler
+from metapensiero.signal import handler
 from raccoon.rocky.node import Path
 
 from raccoon.rocky.node.wamp import call

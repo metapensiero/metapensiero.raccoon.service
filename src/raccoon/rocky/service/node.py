@@ -6,11 +6,19 @@
 # :Copyright: Copyright (C) 2016, 2017 Arstecnica s.r.l.
 #
 
-from metapensiero.reactive import get_tracker
+from abc import ABCMeta
+
+from metapensiero.reactive import get_tracker, ReactiveDict
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
 from raccoon.rocky.node import call
+from raccoon.rocky.node.wamp import WAMPInitMeta
 from raccoon.rocky import node
 
+class ABCSignalHandlerMeta(ABCMeta, SignalAndHandlerInitMeta):
+    pass
+
+class ABCWAMPMeta(ABCSignalHandlerMeta, WAMPInitMeta):
+    pass
 
 class ServiceNode(metaclass=SignalAndHandlerInitMeta):
     """Base node for all the service stuff."""
@@ -57,6 +65,10 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
         await super()._node_bind(path, context, parent)
         self.node_location = system.register_node(self)
 
+    async def node_add(self, name, value):
+        await super().node_add(name, value)
+        self.__setitem__(name, value)
+
     def node_changed(self):
         self.node_location.changed()
 
@@ -83,6 +95,10 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
                     res[name] = None
         return res
 
+    async def node_remove(self, name):
+        self.__delitem__(name)
+        await super().node_remove(name)
+
     def node_resolve(self, uri):
         from . import system
         if isinstance(uri, node.Path):
@@ -92,13 +108,20 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
         return system.resolve(uri)
 
 
-class Node(ServiceNode, node.Node):
+class ReactiveServiceNode(ReactiveDict, ServiceNode,
+                          metaclass=ABCSignalHandlerMeta):
+
+    __hash__ = ServiceNode.__hash__
+    __eq__ = ServiceNode.__eq__
+
+
+class Node(ReactiveServiceNode, node.Node):
     """A mix between a :class:`ServiceNode` and a
     :class:`~raccoon.rocky.node.node.Node`.
     """
 
 
-class WAMPNode(ServiceNode, node.WAMPNode):
+class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
     """A mix between a :class:`ServiceNode` and a
     :class:`~raccoon.rocky.node.node.WAMPNode`.
     """
