@@ -7,8 +7,9 @@
 #
 
 from abc import ABCMeta
+import reprlib
 
-from metapensiero.reactive import get_tracker, ReactiveDict
+from metapensiero.reactive import get_tracker, ReactiveDict, ReactiveChainMap
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
 from raccoon.rocky.node import call
 from raccoon.rocky.node.wamp import WAMPInitMeta
@@ -110,10 +111,65 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
 
 class ReactiveServiceNode(ReactiveDict, ServiceNode,
                           metaclass=ABCSignalHandlerMeta):
+    """A Node that is also a mapping, accessible via the
+    `collections.abc.MutableMapping` protocol. Every value stored gets its own
+    dependency so it can be tracked independently. any new node added via
+    `node_add` becomes part of this tracking. It exposes four different
+    streams of changes to it:
+
+    `structure`
+      tracks all the `__setitem__` of new keys and the `__delitem__`.
+
+    `immutables`
+      tracks all the changes to keys with hashable values.
+
+    `reactives`
+      track the changes to the values that are reactive (like other nodes).
+
+    `all`
+      an union of the previous three
+    """
 
     __hash__ = ServiceNode.__hash__
     __eq__ = ServiceNode.__eq__
 
+    def __repr__(self):
+        return "<%s  at '%s', %r>" % (self.__class__.__name__,
+                                      self.node_path, self.data)
+
+
+class ReactiveContextNode(ReactiveChainMap, ServiceNode,
+                          metaclass=ABCSignalHandlerMeta):
+    """A context-manager Node. It's similar to the `ReactiveServiceNode` but
+    exposes a global context in the `globals` member. Its own reactive storage
+    is mapped as a layer on this one.
+
+    :param \*maps: a list of mappings that will form the new global context.
+      If not given, it will be initialized to an empty one.
+    """
+
+    __hash__ = ServiceNode.__hash__
+    __eq__ = ServiceNode.__eq__
+
+    globals = None
+    """A `ReactiveChainMap` containing the global context."""
+
+    def __init__(self, *maps):
+        self.globals = ReactiveChainMap(*maps)
+        ReactiveChainMap.__init__(self, {}, *self.globals.maps)
+
+    @reprlib.recursive_repr()
+    def __repr__(self):
+        return "<%s  at '%s', %s>" % (self.__class__.__name__,
+                                      self.node_path,
+                                      ', '.join(map(repr, self.maps)))
+
+    def new_context(self, local=False, **kwargs):
+        if local:
+            res = (kwargs,) + tuple(self.maps)
+        else:
+            res = (kwargs, ) + tuple(self.globals.maps)
+        return res
 
 class Node(ReactiveServiceNode, node.Node):
     """A mix between a :class:`ServiceNode` and a
@@ -125,6 +181,18 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
     """A mix between a :class:`ServiceNode` and a
     :class:`~raccoon.rocky.node.node.WAMPNode`.
     """
+
+    @call
+    def node_info(self, **_):
+        return super().node_info()
+
+    @call('.')
+    def node_primary_description(self, span=0, **_):
+        return super().node_primary_description(span)
+
+
+
+class ContextNode(ReactiveContextNode, node.WAMPNode, metaclass=ABCWAMPMeta):
 
     @call
     def node_info(self, **_):

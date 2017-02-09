@@ -13,7 +13,7 @@ reactive.set_flusher_factory(AsyncioFlushManager)
 
 from raccoon.rocky.node import NodeContext
 from .message import on_message, Message
-from .node import Node, WAMPNode, when_node
+from .node import ContextNode, Node, WAMPNode, when_node
 from .pairable import PairableNode
 from .service import BaseService, ApplicationService
 from .session import SessionRoot, SessionMember, bootstrap_session
