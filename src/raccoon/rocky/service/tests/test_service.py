@@ -104,8 +104,8 @@ async def test_application_service(connection1, connection2, event_loop,
 
     class MyApplication(SessionMember):
 
-        def __init__(self, context):
-            super().__init__(context)
+        def __init__(self, *maps, node_context=None):
+            super().__init__(*maps, node_context=node_context)
             self._counter = 0
 
         @call

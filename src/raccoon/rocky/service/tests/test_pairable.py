@@ -29,13 +29,10 @@ async def test_role_paths(connection1, connection2, event_loop,
 
     class MyApplication(SessionMember):
 
-        def __init__(self, context):
-            super().__init__(context)
-
         async def create_new_peer(self, details):
             assert 'id' in details
             foo = TestPairable(
-                self.node_context.new(
+                node_context=self.node_context.new(
                     pairing_request = details,
                     role='view'
                 )
@@ -62,7 +59,7 @@ async def test_role_paths(connection1, connection2, event_loop,
         async def peer_start(self, start_info):
             # it should work w/o transaction
             bar = TestPairable(
-                self.node_context.new(
+                node_context=self.node_context.new(
                     pairing_request='prova',
                     role='bello'
                 )

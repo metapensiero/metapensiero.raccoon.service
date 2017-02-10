@@ -109,17 +109,6 @@ class SessionRoot(ContextNode):
         for id in to_remove:
             del self._pairing_requests[id]
 
-    async def node_bind(self, path, context, parent=None):
-        """Just to customize incoming context."""
-        assert context is not None
-        self.node_context = nc = context.new()
-        for pr in nc.path_resolvers:
-            if isinstance(pr, RolePathResolver):
-                break
-        else:
-            nc.path_resolvers.append(RolePathResolver())
-        await super().node_bind(path, context, parent)
-
     @call
     async def pairing_request(self, src_location, info, **_):
         """Start a new pairing of two or more objects."""
@@ -146,6 +135,20 @@ class SessionRoot(ContextNode):
 
 
 class SessionMember(PairableNode):
+
+    async def node_bind(self, path, context=None, parent=None):
+        """Just to customize incoming context."""
+        if self.node_context is not None:
+            nc = self.node_context
+        else:
+            assert context is not None
+            self.node_context = nc = context.new()
+        for pr in nc.path_resolvers:
+            if isinstance(pr, RolePathResolver):
+                break
+        else:
+            nc.path_resolvers.append(RolePathResolver())
+        await super().node_bind(path, context, parent)
 
     @on_message('pairing_request')
     async def handle_pairing_message(self, msg):
@@ -184,7 +187,7 @@ async def bootstrap_session(wamp_context, service_uri, factory,
                                    pairing_request={'id': 0},
                                    session_id=session_info['id'])
     local_path = Path(session_info['location'], session_info['base'])
-    local_session_member = factory(session_ctx)
+    local_session_member = factory(node_context=session_ctx)
     assert isinstance(local_session_member, SessionMember)
     await local_session_member.node_bind(local_path, session_ctx)
     return local_session_member
