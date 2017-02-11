@@ -133,6 +133,12 @@ class SessionRoot(ContextNode):
         await self.node_add(self.local_location_name, local_member)
         self.manage_pairings()
 
+    @on_message('session_stop')
+    async def stop(self, msg):
+        p = str(self.node_path)
+        await self.node_unbind()
+        logger.info("Session at '%s' STOPPED", p)
+
 
 class SessionMember(PairableNode):
 
