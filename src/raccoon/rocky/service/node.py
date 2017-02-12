@@ -76,7 +76,7 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
     def node_depend(self):
         self.node_location.depend()
 
-    def node_info(self, **_):
+    def node_info(self):
         from . import system
         return {
             'uri': str(self.node_path),
@@ -84,7 +84,7 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
             'system': system.node_info()
         }
 
-    def node_primary_description(self, span=0, **_):
+    def node_primary_description(self, span=0):
         res = {
             '.': self._node_description()
         }
@@ -183,11 +183,11 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
     """
 
     @call
-    def node_info(self, **_):
+    def node_info(self):
         return super().node_info()
 
     @call('.')
-    def node_primary_description(self, span=0, **_):
+    def node_primary_description(self, span=0):
         return super().node_primary_description(span)
 
 
@@ -195,11 +195,11 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
 class ContextNode(ReactiveContextNode, node.WAMPNode, metaclass=ABCWAMPMeta):
 
     @call
-    def node_info(self, **_):
+    def node_info(self):
         return super().node_info()
 
     @call('.')
-    def node_primary_description(self, span=0, **_):
+    def node_primary_description(self, span=0):
         return super().node_primary_description(span)
 
 

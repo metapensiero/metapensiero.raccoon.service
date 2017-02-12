@@ -56,7 +56,7 @@ async def test_double_services(connection1, connection2, event_loop, events):
             self.pong.notify()
 
         @handler('on_start')
-        def _set_started_event(self, **_):
+        def _set_started_event(self):
             events[self.node_name].set()
 
     base = Path('raccoon.test')
@@ -99,7 +99,7 @@ async def test_application_service(connection1, connection2, event_loop,
     class MyAppService(ApplicationService):
 
         @handler('on_start')
-        def _set_started_event(self, **_):
+        def _set_started_event(self):
             events['app_started'].set()
 
     class MyApplication(SessionMember):

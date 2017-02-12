@@ -110,7 +110,7 @@ class SessionRoot(ContextNode):
             del self._pairing_requests[id]
 
     @call
-    async def pairing_request(self, src_location, info, **_):
+    async def pairing_request(self, src_location, info):
         """Start a new pairing of two or more objects."""
         pr = PairingRequest(self.locations, info)
         pr_id = self._new_pairing_id()
@@ -123,7 +123,7 @@ class SessionRoot(ContextNode):
         return pr_id
 
     @handler('on_node_bind')
-    async def start(self, **_):
+    async def start(self):
         """Start the bounded session."""
         self.globals['user'] = None
         member_context = self.node_context.new(location=self.local_location_name,
