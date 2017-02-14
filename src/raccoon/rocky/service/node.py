@@ -146,15 +146,15 @@ class ReactiveServiceNode(ReactiveDict, ServiceNode,
     __eq__ = ServiceNode.__eq__
 
     def __repr__(self):
-        return "<%s  at '%s', %r>" % (self.__class__.__name__,
+        return "<%s at '%s', %r>" % (self.__class__.__name__,
                                       self.node_path, self.data)
 
 
 class ReactiveContextNode(ReactiveChainMap, ServiceNode,
                           metaclass=ABCSignalHandlerMeta):
-    """A context-manager Node. It's similar to the `ReactiveServiceNode` but
-    exposes a global context in the `globals` member. Its own reactive storage
-    is mapped as a layer on this one.
+    """A context-manager Node. It's similar to the :class:`ReactiveServiceNode`
+    but exposes a global context in the `globals` member. Its own reactive
+    storage is mapped as a layer on this one.
 
     :param \*maps: a list of mappings that will form the new global context.
       If not given, it will be initialized to an empty one.
@@ -164,7 +164,9 @@ class ReactiveContextNode(ReactiveChainMap, ServiceNode,
     __eq__ = ServiceNode.__eq__
 
     globals = None
-    """A `ReactiveChainMap` containing the global context."""
+    """An instance of :class:`~metapensiero.reactive.dict.ReactiveChainMap`
+    containing the global context.
+    """
 
     def __init__(self, *maps):
         self.globals = ReactiveChainMap(*maps)
@@ -185,13 +187,13 @@ class ReactiveContextNode(ReactiveChainMap, ServiceNode,
 
 
 class Node(ReactiveServiceNode, node.Node):
-    """A mix between a :class:`ServiceNode` and a
+    """A mix between a :class:`ReactiveServiceNode` and a
     :class:`~raccoon.rocky.node.node.Node`.
     """
 
 
 class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
-    """A mix between a :class:`ServiceNode` and a
+    """A mix between a :class:`ReactiveServiceNode` and a
     :class:`~raccoon.rocky.node.node.WAMPNode`.
     """
 
