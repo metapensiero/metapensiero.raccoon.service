@@ -205,6 +205,14 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
 
 class ContextNode(ReactiveContextNode, node.WAMPNode, metaclass=ABCWAMPMeta):
 
+    @handler('on_node_bind')
+    def _add_context(self):
+        self.node_context.context = self
+
+    @handler('on_node_unbind')
+    def _remove_context(self):
+        del self.node_context.context
+
     @call
     def node_info(self):
         return super().node_info()
