@@ -15,11 +15,14 @@ from raccoon.rocky.node import call
 from raccoon.rocky.node.wamp import WAMPInitMeta
 from raccoon.rocky import node
 
+
 class ABCSignalHandlerMeta(ABCMeta, SignalAndHandlerInitMeta):
     pass
 
+
 class ABCWAMPMeta(ABCSignalHandlerMeta, WAMPInitMeta):
     pass
+
 
 class ServiceNode(metaclass=SignalAndHandlerInitMeta):
     """Base node for all the service stuff."""
@@ -101,6 +104,13 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
         await super().node_remove(name)
 
     def node_resolve(self, uri):
+        """Resolve a path to a Node.
+
+        :param str uri: the uri to resolve.
+        :returns: A `raccoon.rocky.node.node.Node` or ``None`` if the
+          operation fails.
+
+        """
         from . import system
         if isinstance(uri, node.Path):
             uri = str(uri)
@@ -170,6 +180,7 @@ class ReactiveContextNode(ReactiveChainMap, ServiceNode,
         else:
             res = (kwargs, ) + tuple(self.globals.maps)
         return res
+
 
 class Node(ReactiveServiceNode, node.Node):
     """A mix between a :class:`ServiceNode` and a
