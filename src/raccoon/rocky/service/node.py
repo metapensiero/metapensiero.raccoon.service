@@ -10,7 +10,7 @@ from abc import ABCMeta
 import reprlib
 
 from metapensiero.reactive import get_tracker, ReactiveDict, ReactiveChainMap
-from metapensiero.signal import Signal, SignalAndHandlerInitMeta
+from metapensiero.signal import Signal, SignalAndHandlerInitMeta, handler
 from raccoon.rocky.node import call
 from raccoon.rocky.node.wamp import WAMPInitMeta
 from raccoon.rocky import node
