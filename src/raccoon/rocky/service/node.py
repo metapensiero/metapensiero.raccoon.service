@@ -111,6 +111,8 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
           operation fails.
 
         """
+        if isinstance(uri, node.Node):
+            return uri
         from . import system
         if isinstance(uri, node.Path):
             uri = str(uri)
