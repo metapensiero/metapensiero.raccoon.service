@@ -72,7 +72,7 @@ class PairableNode(ContextNode):
         self.pairing_active = False
         self.node_location.changed()
 
-    @handler('on_node_bind')
+    @handler('on_node_bind', end=True)
     async def handle_registration_success(self):
         """
         When the registration is completed, check for the existence of a
