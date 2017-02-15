@@ -43,7 +43,7 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
                 isinstance(value, (list, tuple, dict, int, float, str)))
 
     def _node_children(self):
-        return {k:v for k, v in self.__dict__.items()
+        return {k: v for k, v in self.__dict__.items()
                 if k != 'node_parent' and isinstance(v, node.Node)}
 
     def _node_description(self):
@@ -204,7 +204,6 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
     @call('.')
     def node_primary_description(self, span=0):
         return super().node_primary_description(span)
-
 
 
 class ContextNode(ReactiveContextNode, node.WAMPNode, metaclass=ABCWAMPMeta):
