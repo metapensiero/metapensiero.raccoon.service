@@ -174,9 +174,9 @@ class ReactiveContextNode(ReactiveChainMap, ServiceNode,
 
     @reprlib.recursive_repr()
     def __repr__(self):
-        return "<%s  at '%s', %s>" % (self.__class__.__name__,
-                                      self.node_path,
-                                      ', '.join(map(repr, self.maps)))
+        return "<%s at '%s', %s>" % (self.__class__.__name__,
+                                     self.node_path,
+                                     ', '.join(map(repr, self.maps)))
 
     def new_context(self, local=False, **kwargs):
         if local:
