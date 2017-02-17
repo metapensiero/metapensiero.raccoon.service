@@ -124,7 +124,7 @@ class SessionRoot(ContextNode):
 
     @handler('on_node_bind')
     async def start(self):
-        """Start the bounded session."""
+        """Start the session."""
         self.globals['user'] = None
         member_context = self.node_context.new(location=self.local_location_name,
                                                pairing_request={'id': 0})
