@@ -19,7 +19,7 @@ class UserMeta(ABCWAMPMeta):
         global ANONYMOUS
         if user_id:
             if not login and (not user_name or
-                (user_name and user_name.lower() == 'anonymous')):
+                              (user_name and user_name.lower() == 'anonymous')):
                 raise ValueError("Some fields are missing")
             result = super().__call__(user_id, login, user_name, source)
         else:
