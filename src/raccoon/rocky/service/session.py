@@ -169,7 +169,8 @@ class SessionMember(PairableNode):
 
     @on_message('pairing_request')
     async def handle_pairing_message(self, msg):
-        """Listens for messages of type 'peer_ready'"""
+        """Listens for messages of type 'pairing_request' and call
+        :meth:`create_new_peer` with their `details`."""
         await self.create_new_peer(msg.details)
 
     async def create_new_peer(self, details):
