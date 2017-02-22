@@ -18,6 +18,7 @@ from .node import ContextNode
 from .message import Message, on_message
 from .pairable import PairableNode
 from .resolver import RolePathResolver
+from .user import User
 
 logger = logging.getLogger(__name__)
 
@@ -110,6 +111,12 @@ class SessionRoot(ContextNode):
         for id in to_remove:
             del self._pairing_requests[id]
 
+    async def node_bind(self, path, context=None, parent=None):
+        """Just to customize incoming context."""
+        context.user = None
+        context.session = self
+        return await super().node_bind(path, context, parent)
+
     @call
     async def pairing_request(self, src_location, info):
         """Start a new pairing of two or more objects."""
@@ -122,6 +129,11 @@ class SessionRoot(ContextNode):
                 msg.send(self.node_path + loc)
         self.manage_pairings().invalidate()
         return pr_id
+
+    async def set_user(self, user_node):
+        assert isinstance(user_node, User), "Wrong user type"
+        await self.node_add('user', user_node)
+        self.node_context.user = user_node
 
     @handler('on_node_bind')
     async def start(self):
