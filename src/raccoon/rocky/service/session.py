@@ -138,8 +138,8 @@ class SessionRoot(ContextNode):
     @handler('on_node_bind')
     async def start(self):
         """Start the session."""
-        member_context = self.node_context.new(location=self.local_location_name,
-                                               pairing_request={'id': 0})
+        member_context = self.node_context.new(
+            location=self.local_location_name, pairing_request={'id': 0})
         local_member = self._local_member_factory(node_context=member_context)
         await self.node_add(self.local_location_name, local_member)
         self.manage_pairings()
