@@ -36,8 +36,8 @@ class PairableNode(ContextNode):
     """Flag that it's true when the pairing is correctly setup and isn't
     stopped."""
 
-    def __init__(self, *maps, node_context=None):
-        super().__init__(*maps)
+    def __init__(self, node_context=None):
+        super().__init__()
         self.node_context = node_context
 
     def _pairable_notify_stop(self):

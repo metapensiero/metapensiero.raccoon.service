@@ -56,7 +56,7 @@ class SessionRoot(ContextNode):
 
     status = None
 
-    def __init__(self, *maps, locations, local_location_name,
+    def __init__(self, locations, local_location_name,
                  local_member_factory):
         """
         :param maps: a list of maps that will form the global context.
@@ -71,13 +71,14 @@ class SessionRoot(ContextNode):
         :param local_member_factory: the node object class that
           will fulfill the *local* location.
         """
-        super().__init__(*maps)
+        super().__init__()
         self.locations = locations
         self.local_location_name = local_location_name
         self._pairing_requests = {}
         self._pairing_counter = 0
         self._pairing_requests[0] = PairingRequest(locations)
         self._local_member_factory = local_member_factory
+        self.user = None
 
     def _new_pairing_id(self):
         """Generate a new pairing id."""
@@ -125,11 +126,9 @@ class SessionRoot(ContextNode):
     @handler('on_node_bind')
     async def start(self):
         """Start the session."""
-        self.globals['user'] = None
         member_context = self.node_context.new(location=self.local_location_name,
                                                pairing_request={'id': 0})
-        local_member = self._local_member_factory(*self.new_context(),
-                                                  node_context=member_context)
+        local_member = self._local_member_factory(node_context=member_context)
         await self.node_add(self.local_location_name, local_member)
         self.manage_pairings()
 

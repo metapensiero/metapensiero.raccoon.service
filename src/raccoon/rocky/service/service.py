@@ -129,13 +129,12 @@ class ApplicationService(BaseService):
         return str(res)
 
     async def _create_session(self, session_id, from_location):
-        session_ctx = self.node_context.new()
+        session_ctx = self.node_context.new(service=self,
+                                            session_id=session_id)
         session_ctx.session_id = session_id
         session_path = Path(self.node_path + session_id)
         session_path.base = session_path
-        sess = SessionRoot(*self.new_context(service=self,
-                                             session_id=session_id),
-                           locations=[from_location, self.location_name],
+        sess = SessionRoot(locations=[from_location, self.location_name],
                            local_location_name=self.location_name,
                            local_member_factory=self._factory)
         await sess.node_bind(session_path, session_ctx, self)

@@ -147,43 +147,7 @@ class ReactiveServiceNode(ReactiveDict, ServiceNode,
 
     def __repr__(self):
         return "<%s at '%s', %r>" % (self.__class__.__name__,
-                                      self.node_path, self.data)
-
-
-class ReactiveContextNode(ReactiveChainMap, ServiceNode,
-                          metaclass=ABCSignalHandlerMeta):
-    """A context-manager Node. It's similar to the :class:`ReactiveServiceNode`
-    but exposes a global context in the `globals` member. Its own reactive
-    storage is mapped as a layer on this one.
-
-    :param \*maps: a list of mappings that will form the new global context.
-      If not given, it will be initialized to an empty one.
-    """
-
-    __hash__ = ServiceNode.__hash__
-    __eq__ = ServiceNode.__eq__
-
-    globals = None
-    """An instance of :class:`~metapensiero.reactive.dict.ReactiveChainMap`
-    containing the global context.
-    """
-
-    def __init__(self, *maps):
-        self.globals = ReactiveChainMap(*maps)
-        ReactiveChainMap.__init__(self, {}, *self.globals.maps)
-
-    @reprlib.recursive_repr()
-    def __repr__(self):
-        return "<%s at '%s', %s>" % (self.__class__.__name__,
-                                     self.node_path,
-                                     ', '.join(map(repr, self.maps)))
-
-    def new_context(self, local=False, **kwargs):
-        if local:
-            res = (kwargs,) + tuple(self.maps)
-        else:
-            res = (kwargs, ) + tuple(self.globals.maps)
-        return res
+                                     self.node_path, self.data)
 
 
 class Node(ReactiveServiceNode, node.Node):
@@ -206,7 +170,7 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
         return super().node_primary_description(span)
 
 
-class ContextNode(ReactiveContextNode, node.WAMPNode, metaclass=ABCWAMPMeta):
+class ContextNode(WAMPNode):
 
     @handler('on_node_bind')
     def _add_context(self):
@@ -215,14 +179,6 @@ class ContextNode(ReactiveContextNode, node.WAMPNode, metaclass=ABCWAMPMeta):
     @handler('on_node_unbind')
     def _remove_context(self):
         del self.node_context.context
-
-    @call
-    def node_info(self):
-        return super().node_info()
-
-    @call('.')
-    def node_primary_description(self, span=0):
-        return super().node_primary_description(span)
 
 
 def when_node(condition, *nodes):
