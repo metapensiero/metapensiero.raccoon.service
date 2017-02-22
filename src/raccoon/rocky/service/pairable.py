@@ -73,7 +73,7 @@ class PairableNode(ContextNode):
         self.node_location.changed()
 
     @handler('on_node_bind', end=True)
-    async def handle_registration_success(self):
+    async def init_pairing(self):
         """
         When the registration is completed, check for the existence of a
         `pairing_request` member on the node context. If that exists, either
