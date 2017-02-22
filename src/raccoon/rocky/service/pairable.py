@@ -61,8 +61,8 @@ class PairableNode(ContextNode):
         if peers:
             self.node_context.peers = peers
         logger.debug("Pairing phase completed with peers: '%s'", peers)
-        await self.peer_start(details)
         self.pairing_active = True
+        await self.peer_start(details)
         self.node_location.changed()
 
     @on_message('peer_stop')
