@@ -14,6 +14,7 @@ from raccoon.rocky.service.service import ApplicationService
 from raccoon.rocky.service.session import SessionMember, bootstrap_session
 from raccoon.rocky.service.pairable import PairableNode
 
+
 @pytest.mark.asyncio
 async def test_role_paths(connection1, connection2, event_loop,
                           events):
