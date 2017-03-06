@@ -6,10 +6,14 @@
 # :Copyright: Copyright (C) 2016, 2017 Arstecnica s.r.l.
 #
 
+from collections.abc import Mapping
+
+from raccoon.rocky.node import Node
 from raccoon.rocky.node.path import norm_path, PathError
+from raccoon.rocky.node.proxy import Proxy
 
 
-class RolePathResolver:
+class ContextPathResolver:
     """
     Extend the path resolution machinery with a way to automatically resolve
     peers from their role name.
@@ -19,11 +23,18 @@ class RolePathResolver:
     """
 
     def __call__(self, path, query, context):
-        peers = context.get('peers')
-        if peers and query[0].startswith('#') and len(query[0]) > 1:
-            name = query[0][1:]
-            if name not in peers:
-                raise PathError("Asked to resolve a role '%s' but it's not in"
-                                " the peers", name)
-            peer_path = norm_path(peers[query[0][1:]])
-            return peer_path + query[1:]
+        if query[0].startswith('#') and len(query[0]) > 1:
+            q = (query[0][1:], *query[1:])
+            container = context
+            context_path = None
+            for ix, name in enumerate(q):
+                if name not in container:
+                    raise PathError("Asked to resolve a nearest '%s' but it's"
+                                    " not in the node_context", name)
+                elif isinstance(container[name], (Proxy, Node)):
+                    context_path = norm_path(
+                        container[name].node_path, full=True) + q[ix+1:]
+                    break
+                elif isinstance(container[name], Mapping):
+                    container = container[name]
+            return context_path

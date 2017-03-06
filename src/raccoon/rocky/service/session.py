@@ -17,7 +17,7 @@ from raccoon.rocky.node.path import Path
 from .node import ContextNode
 from .message import Message, on_message
 from .pairable import PairableNode
-from .resolver import RolePathResolver
+from .resolver import ContextPathResolver
 from .user import User
 
 logger = logging.getLogger(__name__)
@@ -132,8 +132,8 @@ class SessionRoot(ContextNode):
 
     async def set_user(self, user_node):
         assert isinstance(user_node, User), "Wrong user type"
-        await self.node_add('user', user_node)
         self.node_context.user = user_node
+        await self.node_add('user', user_node)
 
     @handler('on_node_bind')
     async def start(self):
@@ -161,10 +161,10 @@ class SessionMember(PairableNode):
             assert context is not None
             self.node_context = nc = context.new()
         for pr in nc.path_resolvers:
-            if isinstance(pr, RolePathResolver):
+            if isinstance(pr, ContextPathResolver):
                 break
         else:
-            nc.path_resolvers.append(RolePathResolver())
+            nc.path_resolvers.append(ContextPathResolver())
         await super().node_bind(path, context, parent)
 
     @on_message('pairing_request')

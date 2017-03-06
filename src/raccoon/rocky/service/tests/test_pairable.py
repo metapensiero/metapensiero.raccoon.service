@@ -34,7 +34,7 @@ async def test_role_paths(connection1, connection2, event_loop,
             assert 'id' in details
             foo = TestPairable(
                 node_context=self.node_context.new(
-                    pairing_request = details,
+                    pairing_request=details,
                     role='view'
                 )
             )
@@ -61,7 +61,11 @@ async def test_role_paths(connection1, connection2, event_loop,
             # it should work w/o transaction
             bar = TestPairable(
                 node_context=self.node_context.new(
-                    pairing_request='prova',
+                    pairing_request={
+                        'context': {
+                            'from_context': str(self.node_path)
+                        }
+                    },
                     role='bello'
                 )
             )
@@ -80,5 +84,10 @@ async def test_role_paths(connection1, connection2, event_loop,
     foo_counter = await tc.bar.remote('#view').inc_counter()
     assert foo_counter == 1
     assert tc.bar._counter == 2
+    assert ('from_context' in tc.bar.node_context and
+            tc.bar.node_context.from_context.node_path == tc.node_path)
+    foo = tc.bar.node_resolve('#view')
+    assert ('from_context' in foo.node_context and
+            foo.node_context.from_context.node_path == tc.node_path)
     await s1.node_unbind()
     await tc.node_unbind()

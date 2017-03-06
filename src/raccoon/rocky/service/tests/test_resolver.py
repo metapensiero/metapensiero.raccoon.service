@@ -6,9 +6,10 @@
 #
 
 import pytest
-from raccoon.rocky.node.path import Path, PathError
 from raccoon.rocky.node.context import NodeContext
-from raccoon.rocky.service.resolver import RolePathResolver
+from raccoon.rocky.node.path import Path, PathError
+from raccoon.rocky.node.proxy import Proxy
+from raccoon.rocky.service.resolver import ContextPathResolver
 
 
 def test_resolve():
@@ -24,11 +25,11 @@ def test_resolve():
     with pytest.raises(PathError):
         p.resolve('#pippo', nc)
 
-    nc.path_resolvers.append(RolePathResolver())
-    nc.peers = {
-        'controller': 'a.path.to.the.controller',
-        'view': 'a.path.to.the.view',
-    }
+    nc.path_resolvers.append(ContextPathResolver())
+    nc.update({
+        'controller': Proxy(None, Path('a.path.to.the.controller')),
+        'view': Proxy(None, Path('a.path.to.the.view')),
+    })
 
     assert str(p.resolve('#controller', nc)) == 'a.path.to.the.controller'
     assert str(p.resolve('#view', nc)) == 'a.path.to.the.view'

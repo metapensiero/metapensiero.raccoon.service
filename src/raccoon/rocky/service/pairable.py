@@ -9,6 +9,7 @@
 import logging
 
 from metapensiero.signal import handler
+from raccoon.rocky.node import Path
 from .message import Message, on_message
 from .node import ContextNode
 
@@ -56,10 +57,20 @@ class PairableNode(ContextNode):
         available peers that will be used in path resolution.
         """
         details = msg.details
-        peers = {l['role']: l['uri'] for l in details['locations'].values()
-                 if l['role']}
+        peers = {}
+        for l in details['locations'].values():
+            uri = l['uri']
+            role = l['role']
+            if uri == self.node_path:
+                peer = self
+            else:
+                peer = self.remote(uri)  # returns a proxy
+            if role:
+                peers[role] = peer
         if peers:
+            # FIXME: nc.peers is still useful?
             self.node_context.peers = peers
+            self.node_context.update(peers)
         logger.debug("Pairing phase completed with peers: '%s'", peers)
         self.pairing_active = True
         await self.peer_start(details)
@@ -81,21 +92,39 @@ class PairableNode(ContextNode):
         on the presence of an `id` property inside it. The id is available
         only when acknowledging.
         """
+        ctx = self.node_context
+        pr = ctx.get('pairing_request')
+        if isinstance(pr, dict):
+            if 'id' in pr:
+                info = pr.get('info', {})
+            else:
+                info = pr
+            if 'context' in info:
+                added_context = info['context']
+                for key, value in added_context.items():
+                    assert isinstance(value, (str, tuple, list, Path))
+                    if not isinstance(value, Path):
+                        # here the string or tuple path is resolved forcibly
+                        # without using the context
+                        value = self.node_path.resolve(value)
+                    obj = self.node_resolve(value)
+                    if obj is None:
+                        obj = self.remote(value)
+                    ctx.set(key, obj)
         await self.peer_init()
-        pr = getattr(self.node_context, 'pairing_request', None)
         if pr and isinstance(pr, dict) and 'id' in pr:
             # this peer is the one created in response to a pairing request
             pr_id = pr['id']
         else:
             # this peer is the one who starts the pairing process
             pr_id = await self.remote('@pairing_request')(
-                self.node_context.location, pr
+                ctx.location, pr
             )
         msg = Message(self, 'peer_ready',
                       id=pr_id,
-                      location=self.node_context.location,
+                      location=ctx.location,
                       uri=str(self.node_path),
-                      role=self.node_context.get('role'))
+                      role=ctx.get('role'))
         msg.send(self.node_path.base)
 
     async def peer_init(self):
