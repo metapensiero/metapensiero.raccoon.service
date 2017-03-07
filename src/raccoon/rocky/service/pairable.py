@@ -41,6 +41,32 @@ class PairableNode(ContextNode):
         super().__init__()
         self.node_context = node_context
 
+    def _expand_context(self):
+        """Update the ``node_context`` of a node with informations in the
+        ``pairing_request``. This complement the `ContexPathResolver`."""
+        pr = self.node_context.get('pairing_request')
+        if isinstance(pr, dict):
+            if 'id' in pr:
+                info = pr.get('info', {})
+            else:
+                info = pr
+            if 'context' in info:
+                added_context = info['context']
+                for key, value in added_context.items():
+                    assert isinstance(value, (str, tuple, list, Path))
+                    if not isinstance(value, Path):
+                        # here the string or tuple path is resolved forcibly
+                        # without using the context
+                        value = self.node_path.resolve(value)
+                    obj = self.node_resolve(value)
+                    if obj is None:
+                        obj = self.remote(value)
+                    self.node_context.set(key, obj)
+
+    async def _node_bind(self, path, context=None, parent=None):
+        await super()._node_bind(path, context, parent)
+        self._expand_context()
+
     def _pairable_notify_stop(self):
         role = self.node_context.get('role')
         peers = self.node_context.get('peers')
@@ -94,23 +120,6 @@ class PairableNode(ContextNode):
         """
         ctx = self.node_context
         pr = ctx.get('pairing_request')
-        if isinstance(pr, dict):
-            if 'id' in pr:
-                info = pr.get('info', {})
-            else:
-                info = pr
-            if 'context' in info:
-                added_context = info['context']
-                for key, value in added_context.items():
-                    assert isinstance(value, (str, tuple, list, Path))
-                    if not isinstance(value, Path):
-                        # here the string or tuple path is resolved forcibly
-                        # without using the context
-                        value = self.node_path.resolve(value)
-                    obj = self.node_resolve(value)
-                    if obj is None:
-                        obj = self.remote(value)
-                    ctx.set(key, obj)
         await self.peer_init()
         if pr and isinstance(pr, dict) and 'id' in pr:
             # this peer is the one created in response to a pairing request
