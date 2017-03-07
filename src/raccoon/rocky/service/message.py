@@ -10,6 +10,7 @@ from functools import wraps
 
 from metapensiero.signal import handler
 from raccoon.rocky.node import Node, Path
+from raccoon.rocky.node.proxy import Proxy
 from .node import ServiceNode
 
 
@@ -58,7 +59,7 @@ class Message:
                                             det=self.details))
 
     def _resolve_destination(self, dest):
-        if isinstance(dest, Node):
+        if isinstance(dest, (Node, Proxy)):
             dest = str(dest.node_path)
         elif isinstance(dest, Path):
             dest = str(dest)
