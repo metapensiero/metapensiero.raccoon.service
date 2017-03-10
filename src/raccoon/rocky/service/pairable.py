@@ -71,9 +71,9 @@ class PairableNode(ContextNode):
         role = self.node_context.get('role')
         peers = self.node_context.get('peers')
         if peers and self.pairing_active:
-            for peer_role, peer_path in peers.items():
+            for peer_role, peer in peers.items():
                 if peer_role != role:
-                    Message(self, 'peer_stop', peer_path).send(role=role)
+                    Message(self, 'peer_stop', peer).send(role=role)
 
     @on_message('peer_start')
     async def handle_start_message(self, msg):
