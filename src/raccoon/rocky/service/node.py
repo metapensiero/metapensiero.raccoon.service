@@ -176,13 +176,13 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
 
 class ContextNode(WAMPNode):
 
-    @handler('on_node_bind')
-    def _add_context(self):
+    async def _node_bind(self, path, context=None, parent=None):
+        await super()._node_bind(path, context, parent)
         self.node_context.context = self
 
-    @handler('on_node_unbind')
-    def _remove_context(self):
+    async def _node_unbind(self):
         del self.node_context.context
+        await super()._node_unbind()
 
 
 def when_node(condition, *nodes):
