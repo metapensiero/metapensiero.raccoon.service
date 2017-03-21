@@ -58,6 +58,11 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
                     desc[k] = v
         return res
 
+    def _node_remove_child(self, child):
+        name = super()._node_remove_child(child)
+        self.__delitem__(name)
+        return name
+
     async def _node_unbind(self):
         from . import system
         await super()._node_unbind()
