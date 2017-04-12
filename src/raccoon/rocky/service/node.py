@@ -150,8 +150,7 @@ class ReactiveServiceNode(ReactiveDict, ServiceNode,
     __eq__ = ServiceNode.__eq__
 
     def __repr__(self):
-        return "<%s at '%s', %r>" % (self.__class__.__name__,
-                                     self.node_path, self.data)
+        return "<%s at '%s'>" % (self.__class__.__name__, self.node_path)
 
 
 class Node(ReactiveServiceNode, node.Node):
