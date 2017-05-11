@@ -86,7 +86,7 @@ class Message:
         return self._source.remote(self.dest).notify(**data)
 
 
-def on_message(type_, signal='.'):
+def on_message(type_, signal='.', **kwargs):
     """Decorator for an handler method, to hook only to a particular `type_`
     of message coming from a `signal`. The wrapped method will receive an
     instance of :class:`Message` as the only argument, carrying all the
@@ -101,6 +101,6 @@ def on_message(type_, signal='.'):
                 msg = Message.read(**kwargs)
                 return func(self, msg)
 
-        return handler(signal)(wrapper)
+        return handler(signal, **kwargs)(wrapper)
 
     return wrap_func
