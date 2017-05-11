@@ -72,8 +72,7 @@ class PairableNode(ContextNode):
         peers = self.node_context.get('peers')
         if peers and self.pairing_active:
             for peer_role, peer in peers.items():
-                if peer_role != role:
-                    Message(self, 'peer_stop', peer).send(role=role)
+                Message(self, 'peer_stop', peer).send(role=role)
 
     @on_message('peer_start')
     async def handle_start_message(self, msg):
@@ -105,6 +104,9 @@ class PairableNode(ContextNode):
     @on_message('peer_stop')
     async def handle_stop_message(self, msg):
         """Obey to the stop of the pairing signalled by one other peer."""
+        # ignore messages sent by itself
+        if msg.source['uri'] == self.node_path:
+            return
         await self.peer_stop()
         self.pairing_active = False
         self.node_location.changed()
