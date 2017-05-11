@@ -23,18 +23,21 @@ class ContextPathResolver:
     """
 
     def __call__(self, path, query, context):
-        if query[0].startswith('#') and len(query[0]) > 1:
-            q = (query[0][1:], *query[1:])
-            container = context
-            context_path = None
-            for ix, name in enumerate(q):
-                if name not in container:
-                    raise PathError("Asked to resolve a nearest '%s' but it's"
-                                    " not in the node_context", name)
-                elif isinstance(container[name], (Proxy, Node)):
-                    context_path = norm_path(
-                        container[name].node_path, full=True) + q[ix+1:]
-                    break
-                elif isinstance(container[name], Mapping):
-                    container = container[name]
-            return context_path
+        if not query[0].startswith('#'):
+            return
+        if len(query) == 1 and query[0] == '#':
+            query = ('#context',)
+        q = (query[0][1:], *query[1:])
+        container = context
+        context_path = None
+        for ix, name in enumerate(q):
+            if name not in container:
+                raise PathError("Asked to resolve a nearest '%s' but it's"
+                                " not in the node_context", name)
+            elif isinstance(container[name], (Proxy, Node)):
+                context_path = norm_path(
+                    container[name].node_path, full=True) + q[ix+1:]
+                break
+            elif isinstance(container[name], Mapping):
+                container = container[name]
+        return context_path

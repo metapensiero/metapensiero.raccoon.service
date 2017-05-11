@@ -29,11 +29,13 @@ def test_resolve():
     nc.update({
         'controller': Proxy(None, Path('a.path.to.the.controller')),
         'view': Proxy(None, Path('a.path.to.the.view')),
+        'context': Proxy(None, Path('a.path.to.the.controller'))
     })
 
     assert str(p.resolve('#controller', nc)) == 'a.path.to.the.controller'
     assert str(p.resolve('#view', nc)) == 'a.path.to.the.view'
     assert str(p.resolve('#view.foo', nc)) == 'a.path.to.the.view.foo'
+    assert str(p.resolve('#', nc)) == 'a.path.to.the.controller'
 
     with pytest.raises(PathError):
         p.resolve('#other.foo')
