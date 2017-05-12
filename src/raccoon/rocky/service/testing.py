@@ -55,14 +55,18 @@ def launch_crossbar(directory):
 
     out = bytearray()
 
-    max_start_time = 10
-    for count in range(20):
-        time.sleep(max_start_time/20)
+    max_attempts = 20
+    attempts = 0
+    seconds = 1
+    while attempts < max_attempts:
+        attempts += 1
+        time.sleep(seconds)
+
         try:
             o = os.read(process.stdout.fileno(), 256)
             if o:
                 out += o
-        except BlockingIOError:  # emacs may flag an error here, ignore it
+        except BlockingIOError:
             pass
 
         if b"transport 'transport-001' started" in out:
@@ -73,12 +77,10 @@ def launch_crossbar(directory):
         final_out = process.stdout.read()
         if final_out:
             out += final_out
-        raise RuntimeError(('Crossbar failed to start or startup detection '
-                            'failed, after {start_time} seconds:'
-                            '\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}').format(
-                                start_time=max_start_time,
-                                stdout=out.decode(),
-                                stderr=process.stderr.read().decode()))
+        raise RuntimeError(f'Crossbar failed to start or startup detection'
+                           f' failed, after {attempts*seconds} seconds:\n'
+                           f'STDOUT:\n{out.decode()}\n'
+                           f'STDERR:\n{process.stderr.read().decode()}')
 
 
 def launch_adhoc_crossbar(config):
