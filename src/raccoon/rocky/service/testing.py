@@ -40,6 +40,7 @@ def launch_crossbar(directory):
     :param directory: the directory containing the configuration file
       (must be writable)
     """
+
     process = subprocess.Popen([sys.executable, '-u', '-m',
                                 'crossbar.controller.cli', 'start',
                                 '--cbdir', str(directory)],
@@ -93,13 +94,11 @@ def launch_adhoc_crossbar(config):
     has all privileges on everything.  One websocket transport is
     defined, listening on ``localhost``.
 
-    The Crossbar process is automatically terminated and temporary
+    The Crossbar process is automatically terminated and the temporary
     directory deleted when the host process terminates.
 
-    :param config: YAML configuration for crossbar (for
-      ``config.yaml``)
+    :param config: YAML configuration for crossbar (for ``config.yaml``)
     :return: the automatically selected port
-
     """
 
     # Get the next available TCP port
@@ -177,14 +176,17 @@ def setup_txaio(event_loop):
 def setup_reactive(event_loop):
     reactive.get_tracker().flusher.loop = event_loop
 
+
 @pytest.fixture
 def init_node_system(event_loop):
     if not system.node_path:
         event_loop.run_until_complete(init_system())
 
+
 @pytest.fixture
 def setup_system(init_node_system, event_loop):
     system.node_context.loop = event_loop
+
 
 @pytest.yield_fixture
 def connection1(request, event_loop, ws_url, setup_txaio, setup_reactive,
@@ -205,11 +207,13 @@ def connection2(request, event_loop, ws_url, setup_txaio, setup_reactive,
     yield conn
     _close_connection(conn, event_loop)
 
+
 def _create_connection(login, event_loop, ws_url):
     conn = Connection(ws_url, 'default', loop=event_loop)
     connect_future = asyncio.ensure_future(conn.connect(**login))
     event_loop.run_until_complete(connect_future)
     return conn
+
 
 def _close_connection(connection, loop):
     loop.run_until_complete(connection.disconnect())
