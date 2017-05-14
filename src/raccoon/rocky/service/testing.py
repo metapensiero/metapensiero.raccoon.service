@@ -40,6 +40,7 @@ def launch_crossbar(directory):
     :param directory: the directory containing the configuration file
       (must be writable)
     """
+
     process = subprocess.Popen([sys.executable, '-u', '-m',
                                 'crossbar.controller.cli', 'start',
                                 '--cbdir', str(directory)],
@@ -54,14 +55,18 @@ def launch_crossbar(directory):
 
     out = bytearray()
 
-    max_start_time = 10
-    for count in range(20):
-        time.sleep(max_start_time/20)
+    max_attempts = 20
+    attempts = 0
+    seconds = 1
+    while attempts < max_attempts:
+        attempts += 1
+        time.sleep(seconds)
+
         try:
             o = os.read(process.stdout.fileno(), 256)
             if o:
                 out += o
-        except BlockingIOError:  # emacs may flag an error here, ignore it
+        except BlockingIOError:
             pass
 
         if b"transport 'transport-001' started" in out:
@@ -72,12 +77,10 @@ def launch_crossbar(directory):
         final_out = process.stdout.read()
         if final_out:
             out += final_out
-        raise RuntimeError(('Crossbar failed to start or startup detection '
-                            'failed, after {start_time} seconds:'
-                            '\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}').format(
-                                start_time=max_start_time,
-                                stdout=out.decode(),
-                                stderr=process.stderr.read().decode()))
+        raise RuntimeError(f'Crossbar failed to start or startup detection'
+                           f' failed, after {attempts*seconds} seconds:\n'
+                           f'STDOUT:\n{out.decode()}\n'
+                           f'STDERR:\n{process.stderr.read().decode()}')
 
 
 def launch_adhoc_crossbar(config):
@@ -93,13 +96,11 @@ def launch_adhoc_crossbar(config):
     has all privileges on everything.  One websocket transport is
     defined, listening on ``localhost``.
 
-    The Crossbar process is automatically terminated and temporary
+    The Crossbar process is automatically terminated and the temporary
     directory deleted when the host process terminates.
 
-    :param config: YAML configuration for crossbar (for
-      ``config.yaml``)
+    :param config: YAML configuration for crossbar (for ``config.yaml``)
     :return: the automatically selected port
-
     """
 
     # Get the next available TCP port
@@ -177,14 +178,17 @@ def setup_txaio(event_loop):
 def setup_reactive(event_loop):
     reactive.get_tracker().flusher.loop = event_loop
 
+
 @pytest.fixture
 def init_node_system(event_loop):
     if not system.node_path:
         event_loop.run_until_complete(init_system())
 
+
 @pytest.fixture
 def setup_system(init_node_system, event_loop):
     system.node_context.loop = event_loop
+
 
 @pytest.yield_fixture
 def connection1(request, event_loop, ws_url, setup_txaio, setup_reactive,
@@ -205,11 +209,13 @@ def connection2(request, event_loop, ws_url, setup_txaio, setup_reactive,
     yield conn
     _close_connection(conn, event_loop)
 
+
 def _create_connection(login, event_loop, ws_url):
     conn = Connection(ws_url, 'default', loop=event_loop)
     connect_future = asyncio.ensure_future(conn.connect(**login))
     event_loop.run_until_complete(connect_future)
     return conn
+
 
 def _close_connection(connection, loop):
     loop.run_until_complete(connection.disconnect())
