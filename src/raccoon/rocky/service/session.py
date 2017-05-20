@@ -55,7 +55,7 @@ class SessionRoot(ContextNode):
     This object is coded to work with the :class:`SessionMember` object.
     """
 
-    status = None
+    _status = None
 
     def __init__(self, locations, local_location_name,
                  local_member_factory, client_details=None):
@@ -90,6 +90,11 @@ class SessionRoot(ContextNode):
         res = self._pairing_counter
         return res
 
+    def _send_status_msg(self, **data):
+        msg = Message(self, 'session_info', **data)
+        msg.send(dest=self.node_path)
+        msg.send(dest=self.node_parent.node_path)
+
     @on_message('peer_ready')
     def handle_pairing_message(self, msg):
         """Listens for messages of type 'peer_ready'."""
@@ -106,6 +111,9 @@ class SessionRoot(ContextNode):
                 for location in pr.locations:
                     p = Path(pr.location_info[location]['uri'])
                     msg.send(p)
+                    if id == 0 and location != self.local_location_name:
+                        # add a proxy to the other locations
+                        setattr(self, location, self.remote(p))
                 to_remove.add(id)
                 if id == 0:
                     logger.info("session at '%s' is now active",
@@ -146,12 +154,26 @@ class SessionRoot(ContextNode):
         local_member = self._local_member_factory(node_context=member_context)
         await self.node_add(self.local_location_name, local_member)
         self.manage_pairings()
+        self.status = 'started'
 
     @on_message('session_stop')
     async def stop(self, msg):
         p = str(self.node_path)
+        self.status = 'stopped'
         await self.node_unbind()
         logger.info("Session at '%s' STOPPED", p)
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, value):
+        if value != self._status:
+            self._status = value
+            self._send_status_msg(status=value)
+        else:
+            self._status = value
 
 
 class SessionMember(PairableNode):
