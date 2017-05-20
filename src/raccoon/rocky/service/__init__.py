@@ -3,7 +3,7 @@
 # :Created:   gio 24 mar 2016, 19.20.15, CET
 # :Author:    Alberto Berti <alberto@arstecnica.it>
 # :License:   GNU General Public License version 3 or later
-# :Copyright: Copyright (C) 2016 Arstecnica s.r.l.
+# :Copyright: Copyright (C) 2016, 2017 Arstecnica s.r.l.
 #
 
 from metapensiero import reactive
@@ -17,7 +17,7 @@ from .node import ContextNode, Node, WAMPNode, when_node
 from .pairable import PairableNode
 from .service import BaseService, ApplicationService
 from .session import SessionRoot, SessionMember, bootstrap_session
-from .user import User, AnonymousUser
+from .user import User
 from . import system
 
 
