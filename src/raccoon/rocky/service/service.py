@@ -130,7 +130,8 @@ class ApplicationService(BaseService):
         self._next_session_num += 1
         return str(res)
 
-    async def _create_session(self, session_id, from_location):
+    async def _create_session(self, session_id, from_location,
+                              client_details=None):
         session_ctx = self.node_context.new(service=self,
                                             session_id=session_id)
         session_ctx.session_id = session_id
@@ -138,7 +139,8 @@ class ApplicationService(BaseService):
         session_path.base = session_path
         sess = self.SESSION_CLASS(locations=[from_location, self.location_name],
                                   local_location_name=self.location_name,
-                                  local_member_factory=self._factory)
+                                  local_member_factory=self._factory,
+                                  client_details=client_details)
         await sess.node_bind(session_path, session_ctx, self)
         return sess
 
@@ -149,7 +151,8 @@ class ApplicationService(BaseService):
            not session_id:
             session_id = self._next_session_id()
             session_root = sr = await self._create_session(session_id,
-                                                           from_location)
+                                                           from_location,
+                                                           details)
             self._sessions[session_id] = session_root
         else:
             session_root = sr = self._sessions[session_id]

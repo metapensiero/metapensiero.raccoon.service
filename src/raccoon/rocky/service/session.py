@@ -58,7 +58,7 @@ class SessionRoot(ContextNode):
     status = None
 
     def __init__(self, locations, local_location_name,
-                 local_member_factory):
+                 local_member_factory, client_details=None):
         """
         :param maps: a list of maps that will form the global context.
         :type locations: tuple
@@ -71,6 +71,8 @@ class SessionRoot(ContextNode):
           :class:`SessionMember` instance
         :param local_member_factory: the node object class that
           will fulfill the *local* location.
+        :param client_details: and instance of autobahn's CallDetails coming
+          from the service call that started all.
         """
         super().__init__()
         self.locations = locations
@@ -80,6 +82,7 @@ class SessionRoot(ContextNode):
         self._pairing_requests[0] = PairingRequest(locations)
         self._local_member_factory = local_member_factory
         self.user = None
+        self._client_details = client_details
 
     def _new_pairing_id(self):
         """Generate a new pairing id."""
