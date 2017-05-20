@@ -107,6 +107,8 @@ class ApplicationService(BaseService):
     factory with a tailored context.
     """
 
+    SESSION_CLASS = SessionRoot
+
     location_name = system.name
 
     def __init__(self, factory, node_path, node_context=None):
@@ -134,9 +136,9 @@ class ApplicationService(BaseService):
         session_ctx.session_id = session_id
         session_path = Path(self.node_path + session_id)
         session_path.base = session_path
-        sess = SessionRoot(locations=[from_location, self.location_name],
-                           local_location_name=self.location_name,
-                           local_member_factory=self._factory)
+        sess = self.SESSION_CLASS(locations=[from_location, self.location_name],
+                                  local_location_name=self.location_name,
+                                  local_member_factory=self._factory)
         await sess.node_bind(session_path, session_ctx, self)
         return sess
 
