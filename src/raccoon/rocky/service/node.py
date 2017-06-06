@@ -6,21 +6,11 @@
 # :Copyright: Copyright (C) 2016, 2017 Arstecnica s.r.l.
 #
 
-from abc import ABCMeta
-
 from metapensiero.reactive import get_tracker, ReactiveDict
-from metapensiero.signal import Signal, SignalAndHandlerInitMeta, handler
+from metapensiero.signal import Signal, SignalAndHandlerInitMeta
 from raccoon.rocky.node import call
 from raccoon.rocky.node.wamp import WAMPInitMeta
 from raccoon.rocky import node
-
-
-class ABCSignalHandlerMeta(ABCMeta, SignalAndHandlerInitMeta):
-    pass
-
-
-class ABCWAMPMeta(ABCSignalHandlerMeta, WAMPInitMeta):
-    pass
 
 
 class ServiceNode(metaclass=SignalAndHandlerInitMeta):
@@ -126,7 +116,7 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
 
 
 class ReactiveServiceNode(ReactiveDict, ServiceNode,
-                          metaclass=ABCSignalHandlerMeta):
+                          metaclass=SignalAndHandlerInitMeta):
     """A Node that is also a mapping, accessible via the
     `collections.abc.MutableMapping` protocol. Every value stored gets its own
     dependency so it can be tracked independently. any new node added via
@@ -159,7 +149,7 @@ class Node(ReactiveServiceNode, node.Node):
     """
 
 
-class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=ABCWAMPMeta):
+class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=WAMPInitMeta):
     """A mix between a :class:`ReactiveServiceNode` and a
     :class:`~raccoon.rocky.node.node.WAMPNode`.
     """
