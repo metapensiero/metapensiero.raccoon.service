@@ -32,12 +32,16 @@ class Message:
     dest = None
     misc = None
 
-    def __init__(self, source, type_, dest=None, **kwargs):
+    def __init__(self, source, type_=None, dest=None, **kwargs):
         assert isinstance(source, ServiceNode), (f"Wrong source type, got "
                                                  f"{source!r}")
         self._source = source
-        self.source = source.node_info()
-        self.type = type_
+        if not self.source:
+            self.source = source.node_info()
+        if type_:
+            self.type = type_
+        else:
+            self.type = self.type if self.type else type(self).__name__
         if dest:
             self.dest = self._resolve_destination(dest)
         else:
@@ -48,8 +52,7 @@ class Message:
         if dest:
             self.dest = self._resolve_destination(dest)
         self.details.update(kwargs)
-        return {'msg_{}'.format(k): v for k, v in self.__dict__.items() if not
-                k.startswith('_')}
+        return self._serialize()
 
     def __repr__(self):
         return ("<{cls}, type: '{type}', src: '{src}',"
@@ -67,6 +70,10 @@ class Message:
             src = self._source
             dest = str(src.node_path.resolve(dest, src.node_context))
         return dest
+
+    def _serialize(self):
+        return {'msg_{}'.format(k): v for k, v in self.__dict__.items() if not
+                k.startswith('_')}
 
     @classmethod
     def read(cls, **kwargs):
