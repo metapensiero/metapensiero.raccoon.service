@@ -27,26 +27,9 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
 
     on_node_primary_signal.name = '.'
 
-    def _is_serializable(self, value):
-        return (value is None or value is True or value is False or
-                isinstance(value, (list, tuple, dict, int, float, str)))
-
     def _node_children(self):
         return {k: v for k, v in self.__dict__.items()
                 if k != 'node_parent' and isinstance(v, node.Node)}
-
-    def _node_description(self):
-        desc = {}
-        res = {
-            'info': self.node_info(),
-            'description': desc
-        }
-        if self.node_context:
-            for k, v in self.node_context.items():
-                if k not in self.node_context.CONFIG_KEYS and \
-                   self._is_serializable(v):
-                    desc[k] = v
-        return res
 
     def _node_remove_child(self, child):
         name = super()._node_remove_child(child)
@@ -80,18 +63,6 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
             'type': self.__class__.__name__,
             'system': system.node_info()
         }
-
-    def node_primary_description(self, span=0):
-        res = {
-            '.': self._node_description()
-        }
-        if span > 0:
-            for name, node_ in self._node_children().items():
-                if isinstance(node_, ServiceNode):
-                    res[name] = node_.node_primary_description(span=span-1)
-                else:
-                    res[name] = None
-        return res
 
     async def node_remove(self, name):
         self.__delitem__(name)
@@ -157,10 +128,6 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=WAMPInitMeta):
     @call
     def node_info(self):
         return super().node_info()
-
-    @call('.')
-    def node_primary_description(self, span=0):
-        return super().node_primary_description(span)
 
 
 class ContextNode(WAMPNode):
