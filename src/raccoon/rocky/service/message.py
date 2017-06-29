@@ -36,7 +36,7 @@ class Message:
         assert isinstance(source, ServiceNode), (f"Wrong source type, got "
                                                  f"{source!r}")
         self._source = source
-        if not self.source:
+        if self.source is None:
             self.source = source.node_info()
         if type_:
             self.type = type_
