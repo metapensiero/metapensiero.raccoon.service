@@ -26,7 +26,8 @@ async def test_system_location(init_node_system, event_loop, setup_reactive):
 
     def depend_on_n(comp):
         nonlocal calls
-        n.node_depend()
+        if n.node_path:
+            n.node_depend()
         calls += 1
 
     tracker = reactive.get_tracker()
@@ -37,4 +38,4 @@ async def test_system_location(init_node_system, event_loop, setup_reactive):
     await n.node_unbind()
     assert len(system.NODE_LOCATION) == 1
 
-    assert computation.invalidated
+    assert computation.invalidated or calls == 2
