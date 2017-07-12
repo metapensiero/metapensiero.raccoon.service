@@ -14,6 +14,10 @@ from raccoon.rocky.node import Path
 from .node import Node
 
 
+class SystemError(Exception):
+    """Error raised during system operations."""
+
+
 class System(Node):
 
     NODE_LOCATION = {}
@@ -77,13 +81,19 @@ class Location(metaclass=LocationMeta):
     def _on_node_unbind(self, node, path, parent):
         assert path.absolute is self._key, "Node changed path after bind"
         self._active = False
-        self.changed()
+        self.changed(override=True)
 
-    def changed(self):
-        self._dependency.changed()
+    def changed(self, override=False):
+        if self._active or override:
+            self._dependency.changed()
+        else:
+            raise SystemError("Location no more active")
 
     def depend(self):
-        self._dependency.depend()
+        if self._active:
+            self._dependency.depend()
+        else:
+            raise SystemError("Location no more active")
 
     @property
     def key(self):
