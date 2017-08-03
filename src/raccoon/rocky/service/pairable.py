@@ -107,9 +107,9 @@ class PairableNode(ContextNode):
         # ignore messages sent by itself
         if msg.source['uri'] == self.node_path:
             return
-        await self.peer_stop()
         self.pairing_active = False
         self.node_location.changed()
+        await self.peer_stop()
 
     @handler('on_node_bind', end=True)
     async def init_pairing(self):
