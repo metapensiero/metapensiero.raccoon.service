@@ -19,7 +19,7 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
     node_location = None
     """The location record."""
 
-    on_node_primary_signal = Signal(sequential_async_handlers=True)
+    on_node_primary_signal = Signal()
     """Signal used to receive *infrastructure* messages. The messages that
     implement the pairing protocol are of type 'pairing_request', 'peer_ready'
     and 'peer_start'.
