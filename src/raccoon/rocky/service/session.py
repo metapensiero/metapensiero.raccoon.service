@@ -160,6 +160,7 @@ class SessionRoot(ContextNode):
     async def stop(self, msg):
         p = str(self.node_path)
         self.status = 'stopped'
+        self.node_context.service.on_session_stopped.notify(self)
         await self.node_unbind()
         logger.info("Session at '%s' STOPPED", p)
 
