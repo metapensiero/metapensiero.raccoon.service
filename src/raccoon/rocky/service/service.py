@@ -8,7 +8,7 @@
 
 import logging
 
-from metapensiero.signal import Signal
+from metapensiero.signal import handler, Signal
 from raccoon.rocky.node import WAMPNodeContext
 from raccoon.rocky.node.path import Path
 from raccoon.rocky.node.wamp import call
@@ -111,6 +111,8 @@ class ApplicationService(BaseService):
 
     location_name = system.name
 
+    on_session_stopped = Signal()
+
     def __init__(self, factory, node_path, node_context=None):
         """
         :param path: Path of the service :term:`WAMP` path
@@ -161,3 +163,7 @@ class ApplicationService(BaseService):
             'base': str(sr.node_path),
             'id': sr.node_context.session_id
         }
+
+    @handler('on_session_stopped')
+    def _remove_session(self, session):
+        del self._sessions[session.node_name]
