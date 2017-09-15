@@ -11,9 +11,9 @@ from .node import WAMPNode
 
 class User(WAMPNode):
 
-    def __init__(self, user_id, login, user_name, source):
+    def __init__(self, user_id, login, full_name, source):
         super().__init__()
         self.user_id = user_id
         self.login = login
-        self.user_name = user_name
+        self.full_name = full_name
         self.source = source
