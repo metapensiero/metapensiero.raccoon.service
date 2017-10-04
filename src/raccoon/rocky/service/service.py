@@ -105,23 +105,27 @@ class ApplicationService(BaseService):
 
     Each time a long-running session starts, it executes the supplied
     factory with a tailored context.
+
+    :param factory: a class or method to execute per-session
+    :param node_path: Path of the service :term:`WAMP` path
+    :type node_path: an instance of :class:`~raccoon.rocky.node.path.Path`
+    :param context: An optional parent context
+    :type context: An instance of
+      :class:`~raccoon.rocky.node.context.WAMPContext`
+    :results: a dictionary containing initial session info.
     """
 
     SESSION_CLASS = SessionRoot
+    """The type of the session to instantiate when `~.create_session` is
+    called."""
 
     location_name = system.name
 
     on_session_stopped = Signal()
+    """The `~metapensiero.signal.atom.Signal` that is fired each time a session is
+    reached a ``stopped`` state."""
 
     def __init__(self, factory, node_path, node_context=None):
-        """
-        :param path: Path of the service :term:`WAMP` path
-        :type path: an instance of :class:`~raccoon.rocky.node.path.Path`
-        :param factory: a class or method to execute per-session
-        :param context: An optional parent context
-        :type context: An instance of
-          :class:`~raccoon.rocky.node.context.WAMPContext`
-        """
         super().__init__(node_path, node_context=node_context)
         self._next_session_num = 1
         self._sessions = {}
@@ -149,6 +153,10 @@ class ApplicationService(BaseService):
     @call
     async def start_session(self, from_location, session_id=None,
                             details=None):
+        """The entrypoint for this service. This should be called by the client to
+        start a session that will establish and orchestrate further
+        communication.
+        """
         if (session_id and session_id not in self._sessions) or \
            not session_id:
             session_id = self._next_session_id()

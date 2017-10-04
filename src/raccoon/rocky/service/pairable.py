@@ -27,7 +27,7 @@ class PairableNode(ContextNode):
     using '#role' paths from the others.
 
     The *master* part of the protocol is implemented by the
-    :class:`~.session.SessionRoot` object.
+    :class:`~service.session.SessionRoot` object.
 
     This object needs the service and session infrastructure to operate
     correctly.
