@@ -90,9 +90,10 @@ class ReactiveServiceNode(ReactiveDict, ServiceNode,
                           metaclass=SignalAndHandlerInitMeta):
     """A Node that is also a mapping, accessible via the
     `collections.abc.MutableMapping` protocol. Every value stored gets its own
-    dependency so it can be tracked independently. any new node added via
-    `node_add` becomes part of this tracking. It exposes four different
-    streams of changes to it:
+    dependency so it can be tracked independently. Any new node added via
+    :meth:`node_add` becomes part of this tracking.
+
+    It exposes four different streams of changes to it:
 
     `structure`
       tracks all the `__setitem__` of new keys and the `__delitem__`.
@@ -101,7 +102,7 @@ class ReactiveServiceNode(ReactiveDict, ServiceNode,
       tracks all the changes to keys with hashable values.
 
     `reactives`
-      track the changes to the values that are reactive (like other nodes).
+      tracks the changes to the values that are reactive (like other nodes).
 
     `all`
       an union of the previous three
@@ -131,6 +132,7 @@ class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=WAMPInitMeta):
 
 
 class ContextNode(WAMPNode):
+    "A node which becomes its own context at bind time."
 
     async def _node_bind(self, path, context=None, parent=None):
         await super()._node_bind(path, context, parent)

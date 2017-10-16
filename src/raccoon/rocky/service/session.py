@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class PairingRequest:
+    """Mostly a dataclass carrying pairing requests info."""
 
     @reactive.Value
     def ready(self):
@@ -178,6 +179,7 @@ class SessionRoot(ContextNode):
 
 
 class SessionMember(PairableNode):
+    """Specialized node representing a session's member."""
 
     async def node_bind(self, path, context=None, parent=None):
         """Just to customize incoming context."""
@@ -221,6 +223,7 @@ async def bootstrap_session(wamp_context, service_uri, factory,
       specify a session_id to join rather than start a new one.
     :returns: an instance of `SessionMember` that is part of the session
     """
+
     loop = loop or asyncio.get_event_loop()
     location_name = location_name or 'client'
     session_starter = str(Path(service_uri) + 'start_session')
