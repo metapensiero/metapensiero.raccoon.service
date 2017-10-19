@@ -10,7 +10,7 @@ from functools import wraps
 
 from metapensiero.signal import handler
 from raccoon.rocky.node import Node, Path
-from raccoon.rocky.node.proxy import Proxy
+from raccoon.rocky.node.wamp import Proxy
 from .node import ServiceNode
 
 

@@ -10,7 +10,7 @@ from collections.abc import Mapping
 
 from raccoon.rocky.node import Node
 from raccoon.rocky.node.path import norm_path, PathError
-from raccoon.rocky.node.proxy import Proxy
+from raccoon.rocky.node.wamp import Proxy
 
 
 class ContextPathResolver:
