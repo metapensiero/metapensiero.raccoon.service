@@ -8,7 +8,7 @@
 import pytest
 from raccoon.rocky.node.context import NodeContext
 from raccoon.rocky.node.path import Path, PathError
-from raccoon.rocky.node.proxy import Proxy
+from raccoon.rocky.node.wamp import Proxy
 from raccoon.rocky.service.resolver import ContextPathResolver
 
 
