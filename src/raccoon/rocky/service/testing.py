@@ -102,7 +102,7 @@ def launch_adhoc_crossbar(config):
     :param config: YAML configuration for crossbar (for ``config.yaml``)
     :return: the automatically selected port
     """
-
+    start = time.time()
     # Get the next available TCP port
     port = get_next_free_tcp_port()
 
@@ -114,7 +114,8 @@ def launch_adhoc_crossbar(config):
         f.write(config % {'port': port})
 
     launch_crossbar(tempdir)
-
+    elapsed = time.time() - start
+    print('Starting Crossbar took %s seconds.' % elapsed)
     return port
 
 
