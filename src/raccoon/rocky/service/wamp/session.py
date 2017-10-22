@@ -23,14 +23,14 @@ class Session(ClientSession, metaclass=SignalAndHandlerInitMeta):
     on_leave = Signal()
     "Signal emitted when the session is detached."
 
-    def onJoin(self, details):
+    async def onJoin(self, details):
         "Emit the :attr:`on_join` signal."
         loop = self.config.extra['joined']._loop
-        self.on_join.notify(details, loop=loop)
+        await self.on_join.notify(details, loop=loop)
         super().onJoin(details)
 
-    def onLeave(self, details):
+    async def onLeave(self, details):
         "Emit the :attr:`on_leave` signal."
         loop = self.config.extra['joined']._loop
-        self.on_leave.notify(details, loop=loop)
+        await self.on_leave.notify(details, loop=loop)
         super().onLeave(details)

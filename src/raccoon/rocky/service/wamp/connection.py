@@ -47,7 +47,7 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
             self.session_details = None
 
     async def _on_session_leave(self, details):
-        return self._notify_disconnect()
+        return await self._notify_disconnect()
 
     async def connect(self, username=None, password=None):
         "Emits the :attr:`on_connect` signal."
