@@ -79,11 +79,11 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
         return WAMPNodeContext(loop=self.loop, wamp_session=self.session)
 
     @on_connect.on_connect
-    async def on_connect(self, handler, subscribers, connect):
+    async def on_connect(self, handler, subscribers, connect, notify):
         """Call handler immediately if the session is attached already."""
         if self.connected:
-            res = connect.notify(handler, session=self.session,
-                                 session_details=self.session_details)
+            res = notify(handler, session=self.session,
+                         session_details=self.session_details)
         else:
             res = self.loop.create_future()
             res.set_result(None)
@@ -94,10 +94,10 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
     "Signal emitted when the connection is deactivated."
 
     @on_disconnect.on_connect
-    async def on_disconnect(self, handler, subscribers, disconnect):
+    async def on_disconnect(self, handler, subscribers, disconnect, notify):
         """Call handler immediately if the session is already attached."""
         if not self.connected:
-            res = disconnect.notify(handler, loop=self.loop)
+            res = notify(handler, loop=self.loop)
         else:
             res = self.loop.create_future()
             res.set_result(None)

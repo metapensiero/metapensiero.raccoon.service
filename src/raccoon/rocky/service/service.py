@@ -34,11 +34,11 @@ class BaseService(ContextNode):
     """
 
     @on_start.on_connect
-    async def on_start(self, handler, subscribers, connect):
+    async def on_start(self, handler, subscribers, connect, notify):
         """Call handler immediately if the service is started already"""
         if self.started:
-            await connect.notify(handler, local_path=self.node_path,
-                                 local_context=self.node_context)
+            await notify(handler, local_path=self.node_path,
+                         local_context=self.node_context)
         connect(handler)
 
     def __init__(self, node_path, node_context=None):
