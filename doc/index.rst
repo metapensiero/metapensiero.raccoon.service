@@ -2,8 +2,8 @@
 .. :Project:   raccoon.rocky.service -- Documentation
 .. :Created:   dom 18 dic 2016 15:13:35 CET
 .. :Author:    Lele Gaifax <lele@metapensiero.it>
-.. :License:   No License
-.. :Copyright: © 2016, 2017 Arstecnica s.r.l.
+.. :License:   GNU General Public License version 3 or later
+.. :Copyright: © 2016, 2017, 2018 Lele Gaifax
 ..
 
 ===========================
