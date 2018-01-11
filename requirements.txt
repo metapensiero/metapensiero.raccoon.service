@@ -1,2 +1,2 @@
--e git+ssh://git@gitlab.com/arstecnica/arstecnica.raccoon.autobahn.git#egg=arstecnica.raccoon.autobahn
--e git+ssh://git@gitlab.com/arstecnica/raccoon.rocky.node.git#egg=raccoon.rocky.node
+https://gitlab.com/arstecnica/arstecnica.raccoon.autobahn/repository/master/archive.zip
+https://gitlab.com/metapensiero/metapensiero.raccoon.node/repository/master/archive.zip
