@@ -7,12 +7,12 @@
 
 import pytest
 from metapensiero.signal import handler
-from raccoon.rocky.node import Path
+from metapensiero.raccoon.node import Path
 
-from raccoon.rocky.node.wamp import call
-from raccoon.rocky.service.service import ApplicationService
-from raccoon.rocky.service.session import SessionMember, bootstrap_session
-from raccoon.rocky.service.pairable import PairableNode
+from metapensiero.raccoon.node.wamp import call
+from metapensiero.raccoon.service.service import ApplicationService
+from metapensiero.raccoon.service.session import SessionMember, bootstrap_session
+from metapensiero.raccoon.service.pairable import PairableNode
 
 
 @pytest.mark.asyncio

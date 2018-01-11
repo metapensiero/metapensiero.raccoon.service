@@ -8,9 +8,9 @@
 
 from collections.abc import Mapping
 
-from raccoon.rocky.node import Node
-from raccoon.rocky.node.path import norm_path, PathError
-from raccoon.rocky.node.proxy import Proxy
+from metapensiero.raccoon.node import Node
+from metapensiero.raccoon.node.path import norm_path, PathError
+from metapensiero.raccoon.node.proxy import Proxy
 
 
 class ContextPathResolver:

@@ -8,8 +8,8 @@
 import pytest
 
 from metapensiero import reactive
-from raccoon.rocky.node import NodeContext
-from raccoon.rocky.service import system, Node
+from metapensiero.raccoon.node import NodeContext
+from metapensiero.raccoon.service import system, Node
 
 
 @pytest.mark.asyncio

@@ -9,8 +9,8 @@
 from functools import wraps
 
 from metapensiero.signal import handler
-from raccoon.rocky.node import Node, Path
-from raccoon.rocky.node.proxy import Proxy
+from metapensiero.raccoon.node import Node, Path
+from metapensiero.raccoon.node.proxy import Proxy
 from .node import ServiceNode
 
 

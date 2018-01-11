@@ -5,5 +5,5 @@
 # :License:   GNU General Public License version 3 or later
 #
 
-from raccoon.rocky.service.testing import *
-from raccoon.rocky.node.testing import *
+from metapensiero.raccoon.service.testing import *
+from metapensiero.raccoon.node.testing import *

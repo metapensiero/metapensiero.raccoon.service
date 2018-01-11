@@ -11,7 +11,7 @@ from metapensiero.reactive.flush.asyncio import AsyncioFlushManager
 
 reactive.set_flusher_factory(AsyncioFlushManager)
 
-from raccoon.rocky.node import NodeContext
+from metapensiero.raccoon.node import NodeContext
 from .message import on_message, Message
 from .node import ContextNode, Node, WAMPNode, when_node
 from .pairable import PairableNode

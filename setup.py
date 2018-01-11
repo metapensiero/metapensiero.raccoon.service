@@ -21,11 +21,11 @@ with open(os.path.join(here, 'version.txt'), encoding='utf-8') as f:
 
 
 setup(
-    name="raccoon.rocky.service",
+    name="metapensiero.raccoon.service",
     version=VERSION,
-    url="https://gitlab.com/arstecnica/raccoon.rocky.service",
+    url="https://gitlab.com/metapensiero/metapensiero.raccoon.service",
 
-    description="Service classes for Rocky",
+    description="Service classes for Raccoon",
     long_description=README + '\n\n' + CHANGES,
 
     author="Alberto Berti",
@@ -40,16 +40,16 @@ setup(
         "Programming Language :: Python :: 3.6",
         ],
     keywords='',
-
-    packages=find_packages('src'),
+    packages=['metapensiero.raccoon.' + pkg
+              for pkg in find_packages('src/metapensiero/raccoon')],
     package_dir={'': 'src'},
-    namespace_packages=['raccoon', 'raccoon.rocky'],
+    namespace_packages=['metapensiero', 'metapensiero.raccoon'],
 
     install_requires=[
         'setuptools',
         'autobahn>=0.13',
         'arstecnica.raccoon.autobahn',
-        'raccoon.rocky.node',
+        'metapensiero.raccoon.node',
         'metapensiero.signal>=0.9',
         'metapensiero.reactive',
     ],
@@ -61,12 +61,13 @@ setup(
         'test': [
             'pytest',
             'pytest-asyncio',
+            'pytest-cov',
             'crossbar>=0.13',
-            'raccoon.rocky.node[test]',
+            'metapensiero.raccoon.node[test]',
         ]
     },
     setup_requires=['pytest-runner'],
     tests_require=[
-        'raccoon.rocky.service[test]'
+        'metapensiero.raccoon.service[test]'
     ],
 )

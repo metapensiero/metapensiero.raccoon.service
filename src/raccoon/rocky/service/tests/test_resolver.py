@@ -6,10 +6,10 @@
 #
 
 import pytest
-from raccoon.rocky.node.context import NodeContext
-from raccoon.rocky.node.path import Path, PathError
-from raccoon.rocky.node.proxy import Proxy
-from raccoon.rocky.service.resolver import ContextPathResolver
+from metapensiero.raccoon.node.context import NodeContext
+from metapensiero.raccoon.node.path import Path, PathError
+from metapensiero.raccoon.node.proxy import Proxy
+from metapensiero.raccoon.service.resolver import ContextPathResolver
 
 
 def test_resolve():

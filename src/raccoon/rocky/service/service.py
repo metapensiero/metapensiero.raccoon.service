@@ -9,9 +9,9 @@
 import logging
 
 from metapensiero.signal import handler, Signal
-from raccoon.rocky.node import WAMPNodeContext
-from raccoon.rocky.node.path import Path
-from raccoon.rocky.node.wamp import call
+from metapensiero.raccoon.node import WAMPNodeContext
+from metapensiero.raccoon.node.path import Path
+from metapensiero.raccoon.node.wamp import call
 
 from .node import ContextNode
 from .session import SessionRoot

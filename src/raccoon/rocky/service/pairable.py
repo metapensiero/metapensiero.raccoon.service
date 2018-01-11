@@ -9,7 +9,7 @@
 import logging
 
 from metapensiero.signal import handler
-from raccoon.rocky.node import Path
+from metapensiero.raccoon.node import Path
 from .message import Message, on_message
 from .node import ContextNode
 

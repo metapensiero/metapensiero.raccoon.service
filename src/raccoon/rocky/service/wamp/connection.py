@@ -11,7 +11,7 @@ import signal
 
 from arstecnica.raccoon.autobahn.client import Client
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
-from raccoon.rocky.node import WAMPNodeContext
+from metapensiero.raccoon.node import WAMPNodeContext
 
 from .session import Session
 

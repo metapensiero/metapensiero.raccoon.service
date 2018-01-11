@@ -8,9 +8,9 @@
 
 from metapensiero.reactive import get_tracker, ReactiveDict
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
-from raccoon.rocky.node import call
-from raccoon.rocky.node.wamp import WAMPInitMeta
-from raccoon.rocky import node
+from metapensiero.raccoon.node import call
+from metapensiero.raccoon.node.wamp import WAMPInitMeta
+from metapensiero.raccoon import node
 
 
 class ServiceNode(metaclass=SignalAndHandlerInitMeta):
@@ -72,7 +72,7 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
         """Resolve a path to a Node.
 
         :param str uri: the uri to resolve.
-        :returns: A `raccoon.rocky.node.node.Node` or ``None`` if the
+        :returns: A `metapensiero.raccoon.node.node.Node` or ``None`` if the
           operation fails.
 
         """

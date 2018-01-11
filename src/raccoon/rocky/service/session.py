@@ -11,8 +11,8 @@ import logging
 
 from metapensiero import reactive
 from metapensiero.signal import handler
-from raccoon.rocky.node import call
-from raccoon.rocky.node.path import Path
+from metapensiero.raccoon.node import call
+from metapensiero.raccoon.node.path import Path
 
 from .node import ContextNode
 from .message import Message, on_message
