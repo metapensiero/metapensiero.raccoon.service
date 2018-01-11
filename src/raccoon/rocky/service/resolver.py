@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- role path resolver
+# :Project:   metapensiero.raccoon.service -- role path resolver
 # :Created:   dom 18 dic 2016 01:59:44 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -8,9 +8,9 @@
 
 from collections.abc import Mapping
 
-from raccoon.rocky.node import Node
-from raccoon.rocky.node.path import norm_path, PathError
-from raccoon.rocky.node.wamp import Proxy
+from metapensiero.raccoon.node import Node
+from metapensiero.raccoon.node.path import norm_path, PathError
+from metapensiero.raccoon.node.proxy import Proxy
 
 
 class ContextPathResolver:

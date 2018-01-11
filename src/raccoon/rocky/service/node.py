@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- base node
+# :Project:   metapensiero.raccoon.service -- base node
 # :Created:   ven 23 dic 2016 14:13:55 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -8,9 +8,9 @@
 
 from metapensiero.reactive import get_tracker, ReactiveDict
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
-from raccoon.rocky.node import call
-from raccoon.rocky.node.wamp import WAMPInitMeta
-from raccoon.rocky import node
+from metapensiero.raccoon.node import call
+from metapensiero.raccoon.node.wamp import WAMPInitMeta
+from metapensiero.raccoon import node
 
 
 class ServiceNode(metaclass=SignalAndHandlerInitMeta):
@@ -72,7 +72,7 @@ class ServiceNode(metaclass=SignalAndHandlerInitMeta):
         """Resolve a path to a Node.
 
         :param str uri: the uri to resolve.
-        :returns: A `raccoon.rocky.node.node.Node` or ``None`` if the
+        :returns: A `metapensiero.raccoon.node.node.Node` or ``None`` if the
           operation fails.
 
         """
@@ -117,13 +117,13 @@ class ReactiveServiceNode(ReactiveDict, ServiceNode,
 
 class Node(ReactiveServiceNode, node.Node):
     """A mix between a :class:`ReactiveServiceNode` and a
-    :class:`~raccoon.rocky.node.node.Node`.
+    :class:`~metapensiero.raccoon.node.node.Node`.
     """
 
 
 class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=WAMPInitMeta):
     """A mix between a :class:`ReactiveServiceNode` and a
-    :class:`~raccoon.rocky.node.node.WAMPNode`.
+    :class:`~metapensiero.raccoon.node.node.WAMPNode`.
     """
 
     @call

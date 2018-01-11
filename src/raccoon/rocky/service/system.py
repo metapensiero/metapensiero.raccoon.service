@@ -10,7 +10,7 @@ import sys
 import weakref
 
 from metapensiero.reactive import get_tracker
-from raccoon.rocky.node import Path
+from metapensiero.raccoon.node import Path
 from .node import Node
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- pairable object
+# :Project:   metapensiero.raccoon.service -- pairable object
 # :Created:   mar 22 nov 2016 22:36:57 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -9,7 +9,7 @@
 import logging
 
 from metapensiero.signal import handler
-from raccoon.rocky.node import Path
+from metapensiero.raccoon.node import Path
 from .message import Message, on_message
 from .node import ContextNode
 

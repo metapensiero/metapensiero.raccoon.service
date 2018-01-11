@@ -1,4 +1,4 @@
 include *.rst Makefile*
 include version.txt
 recursive-include doc *.rst
-recursive-include src/raccoon *.py
+recursive-include src/metapensiero *.py

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- wamp connection class
+# :Project:   metapensiero.raccoon.service -- wamp connection class
 # :Created:   gio 24 mar 2016 20:33:15 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -11,7 +11,7 @@ import signal
 
 from arstecnica.raccoon.autobahn.client import Client
 from metapensiero.signal import Signal, SignalAndHandlerInitMeta
-from raccoon.rocky.node import WAMPNodeContext
+from metapensiero.raccoon.node import WAMPNodeContext
 
 from .session import Session
 
@@ -73,7 +73,7 @@ class Connection(Client, metaclass=SignalAndHandlerInitMeta):
 
     def new_context(self):
         """
-        Return a new :class:`~raccoon.rocky.node.node.WAMPNodeContext`
+        Return a new :class:`~metapensiero.raccoon.node.node.WAMPNodeContext`
         instance tied to this connection.
         """
         return WAMPNodeContext(loop=self.loop, wamp_session=self.session)

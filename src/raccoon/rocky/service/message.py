@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- message
+# :Project:   metapensiero.raccoon.service -- message
 # :Created:   gio 29 dic 2016 02:25:10 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -9,8 +9,8 @@
 from functools import wraps
 
 from metapensiero.signal import handler
-from raccoon.rocky.node import Node, Path
-from raccoon.rocky.node.wamp import Proxy
+from metapensiero.raccoon.node import Node, Path
+from metapensiero.raccoon.node.proxy import Proxy
 from .node import ServiceNode
 
 
@@ -21,8 +21,8 @@ class Message:
     :param source: the sender of the message
     :type type_: str
     :param type_: the type of the message
-    :type dest: ``None``, :class:`~raccoon.rocky.node.node.Node` or
-      :class:`~raccoon.rocky.node.path.Path`
+    :type dest: ``None``, :class:`~metapensiero.raccoon.node.node.Node` or
+      :class:`~metapensiero.raccoon.node.path.Path`
     :param dest: the destination of the message
     :param kwargs: message details
     """
@@ -33,8 +33,8 @@ class Message:
     misc = None
 
     def __init__(self, source, type_=None, dest=None, **kwargs):
-        assert isinstance(source, ServiceNode), (f"Wrong source type, got "
-                                                 f"{source!r}")
+        assert isinstance(source, ServiceNode), (
+            "Wrong source type, got {source!r}".format(source=source))
         self._source = source
         if self.source is None:
             self.source = source.node_info()
