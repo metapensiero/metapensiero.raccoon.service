@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- role path resolver
+# :Project:   metapensiero.raccoon.service -- role path resolver
 # :Created:   dom 18 dic 2016 01:59:44 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later

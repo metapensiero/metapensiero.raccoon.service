@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- service
+# :Project:   metapensiero.raccoon.service -- service
 # :Created:   gio 24 mar 2016 20:33:15 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -43,10 +43,10 @@ class BaseService(ContextNode):
     def __init__(self, node_path, node_context=None):
         """
         :param node_path: Path of the service :term:`WAMP` path
-        :type node_path: an instance of :class:`~raccoon.rocky.node.path.Path`
+        :type node_path: an instance of :class:`~metapensiero.raccoon.node.path.Path`
         :param node_context: An optional parent context
         :type node_context: An instance of
-          :class:`~raccoon.rocky.node.context.WAMPContext`
+          :class:`~metapensiero.raccoon.node.context.WAMPContext`
         """
         super().__init__()
         self._connection = None
@@ -108,10 +108,10 @@ class ApplicationService(BaseService):
 
     :param factory: a class or method to execute per-session
     :param node_path: Path of the service :term:`WAMP` path
-    :type node_path: an instance of :class:`~raccoon.rocky.node.path.Path`
+    :type node_path: an instance of :class:`~metapensiero.raccoon.node.path.Path`
     :param context: An optional parent context
     :type context: An instance of
-      :class:`~raccoon.rocky.node.context.WAMPContext`
+      :class:`~metapensiero.raccoon.node.context.WAMPContext`
     :results: a dictionary containing initial session info.
     """
 

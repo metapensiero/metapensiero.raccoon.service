@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:  raccoon.rocky.service -- pairable tests
+# :Project:  metapensiero.raccoon.service -- pairable tests
 # :Created:  sab 26 mar 2016 18:29:03 CET
 # :Author:   Alberto Berti <alberto@metapensiero.it>
 # :License:  GNU General Public License version 3 or later

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- base node
+# :Project:   metapensiero.raccoon.service -- base node
 # :Created:   ven 23 dic 2016 14:13:55 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -117,13 +117,13 @@ class ReactiveServiceNode(ReactiveDict, ServiceNode,
 
 class Node(ReactiveServiceNode, node.Node):
     """A mix between a :class:`ReactiveServiceNode` and a
-    :class:`~raccoon.rocky.node.node.Node`.
+    :class:`~metapensiero.raccoon.node.node.Node`.
     """
 
 
 class WAMPNode(ReactiveServiceNode, node.WAMPNode, metaclass=WAMPInitMeta):
     """A mix between a :class:`ReactiveServiceNode` and a
-    :class:`~raccoon.rocky.node.node.WAMPNode`.
+    :class:`~metapensiero.raccoon.node.node.WAMPNode`.
     """
 
     @call

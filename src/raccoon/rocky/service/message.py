@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- message
+# :Project:   metapensiero.raccoon.service -- message
 # :Created:   gio 29 dic 2016 02:25:10 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -21,8 +21,8 @@ class Message:
     :param source: the sender of the message
     :type type_: str
     :param type_: the type of the message
-    :type dest: ``None``, :class:`~raccoon.rocky.node.node.Node` or
-      :class:`~raccoon.rocky.node.path.Path`
+    :type dest: ``None``, :class:`~metapensiero.raccoon.node.node.Node` or
+      :class:`~metapensiero.raccoon.node.path.Path`
     :param dest: the destination of the message
     :param kwargs: message details
     """

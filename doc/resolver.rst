@@ -1,5 +1,5 @@
 .. -*- coding: utf-8 -*-
-.. :Project:   raccoon.rocky.service -- resolver documentation
+.. :Project:   metapensiero.raccoon.service -- resolver documentation
 .. :Created:   dom 15 gen 2017 18:57:40 CET
 .. :Author:    Lele Gaifax <lele@metapensiero.it>
 .. :License:   GNU General Public License version 3 or later
@@ -10,5 +10,5 @@
  Resolver
 ==========
 
-.. automodule:: raccoon.rocky.service.resolver
+.. automodule:: metapensiero.raccoon.service.resolver
    :members:

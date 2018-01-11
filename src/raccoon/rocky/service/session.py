@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# :Project:   raccoon.rocky.service -- session
+# :Project:   metapensiero.raccoon.service -- session
 # :Created:   mar 22 nov 2016 22:36:57 CET
 # :Author:    Alberto Berti <alberto@metapensiero.it>
 # :License:   GNU General Public License version 3 or later
@@ -211,7 +211,7 @@ async def bootstrap_session(wamp_context, service_uri, factory,
     in should create an instance whose class is derived from
     :class:`SessionMember`.
 
-    :type wamp_context: :class:`~raccoon.rocky.node.context.WAMPNodeContext`
+    :type wamp_context: :class:`~metapensiero.raccoon.node.context.WAMPNodeContext`
       instance
     :param wamp_context: a node context already connected
     :param str service_uri: the path of the `ApplicationService` to call

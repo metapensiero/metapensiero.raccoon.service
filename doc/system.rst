@@ -1,5 +1,5 @@
 .. -*- coding: utf-8 -*-
-.. :Project:   raccoon.rocky.service -- system documentation
+.. :Project:   metapensiero.raccoon.service -- system documentation
 .. :Created:   dom 15 gen 2017 18:57:45 CET
 .. :Author:    Lele Gaifax <lele@metapensiero.it>
 .. :License:   GNU General Public License version 3 or later
@@ -10,5 +10,5 @@
  System
 ========
 
-.. automodule:: raccoon.rocky.service.system
+.. automodule:: metapensiero.raccoon.service.system
    :members:
