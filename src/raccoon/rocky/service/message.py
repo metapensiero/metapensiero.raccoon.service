@@ -33,8 +33,8 @@ class Message:
     misc = None
 
     def __init__(self, source, type_=None, dest=None, **kwargs):
-        assert isinstance(source, ServiceNode), (f"Wrong source type, got "
-                                                 f"{source!r}")
+        assert isinstance(source, ServiceNode), (
+            "Wrong source type, got {source!r}".format(source=source))
         self._source = source
         if self.source is None:
             self.source = source.node_info()

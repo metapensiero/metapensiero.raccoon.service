@@ -77,10 +77,11 @@ def launch_crossbar(directory):
         final_out = process.stdout.read()
         if final_out:
             out += final_out
-        raise RuntimeError(f'Crossbar failed to start or startup detection'
-                           f' failed, after {attempts*seconds} seconds:\n'
-                           f'STDOUT:\n{out.decode()}\n'
-                           f'STDERR:\n{process.stderr.read().decode()}')
+        raise RuntimeError(
+            ('Crossbar failed to start or startup detection'
+             ' failed, after {attempts*seconds} seconds:\n'
+             'STDOUT:\n{stdout}\nSTDERR:\n{stderr}').format(
+                 stdout=out.decode(), stderr=process.stderr.read().decode()))
 
 
 def launch_adhoc_crossbar(config):
